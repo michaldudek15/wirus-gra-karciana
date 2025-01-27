@@ -1,9 +1,11 @@
 {% extends 'base.html' %}
 
 {% block body %}
-<h1>instrukcja</h1>
-<p><a href="{{ url_for('index') }}" class="button">powrót do strony głównej</a></p>
+<div class="gorny-pasek">
+    <h1>instrukcja</h1>
+    <p class="powrot"><a href="{{ url_for('index') }}" class="button">powrót do strony głównej</a></p>
 
+</div>
 <iframe src="{{ pdf_url }}" 
         width="100%" 
         height="800px" 
@@ -11,6 +13,6 @@
     Twoja przeglądarka nie obsługuje podglądu PDF. Możesz pobrać plik 
     <a href="{{ pdf_url }}">tutaj</a>.
 </iframe>
-<p><a href="{{ url_for('index') }}" class="button">powrót do strony głównej</a></p>
+<p class="powrot"><a href="{{ url_for('index') }}" class="button">powrót do strony głównej</a></p>
 
 {% endblock %}

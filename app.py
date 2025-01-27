@@ -27,6 +27,10 @@ def graSingleplayer():
     player1 = Player(1, "player1")
     player2 = Player(2, "player2")
 
+    testowaKarta1 = Organ("serce", "red", "opis")
+    testowaKarta2 = Organ("mózg", "blue", "opis")
+    testowaKarta3 = Organ("kość", "green", "opis")
+
     gra.addPlayer(player1)
     gra.addPlayer(player2)
 
@@ -38,7 +42,11 @@ def graSingleplayer():
     player2.drawCard(gra.deck)
     player2.drawCard(gra.deck)
 
-    return  render_template('gra.html', player1_hand = player1.hand)
+    player1.organsOnTable[testowaKarta1] = testowaKarta1.status
+    player1.organsOnTable[testowaKarta2] = testowaKarta2.status
+    player2.organsOnTable[testowaKarta3] = testowaKarta3.status
+
+    return  render_template('gra-singleplayer.html', player1 = player1, player2 = player2)
 
 @app.route('/zacznijGreMultiplayer')
 def graMultiplayer():
@@ -47,6 +55,12 @@ def graMultiplayer():
 @app.route('/zacznijGreHotseat')
 def graHotseat():
     return render_template('todo.html')
+
+# @app.route('/zagrajKarte', methods=['POST'])
+# def zagrajKarte():
+#     player1_hand = request.form.get('player')
+
+#     return  render_template('gra-singleplayer.html', player1_hand = player1.hand, player2_hand = player2.hand)
 
 if __name__ == "__main__":
     app.run(debug=True)

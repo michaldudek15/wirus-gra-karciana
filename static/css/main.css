@@ -5,9 +5,79 @@ body {
     background-color: #c3e06d;
 }
 
+h1 {
+    color: #DA2580;
 
-/* Kontener na karty */
-.cards-container {
+    text-shadow: 
+    -1px -1px 0 #ffffff,  /* Góra-lewo */
+    1px -1px 0 #ffffff,   /* Góra-prawo */
+    -1px 1px 0 #ffffff,   /* Dół-lewo */
+    1px 1px 0 #ffffff;    /* Dół-prawo */
+}
+
+/* Kontener na karty bota*/
+.panel-kart-bot {
+    visibility: visible; /* tutaj zmienić potem*/
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    position: fixed;
+    top: 10%;
+    left: 0;
+    right: 0;
+    padding: 10px;
+    background-color: rgba(44, 11, 11, 0.8);
+    height: 100px;
+}
+
+.panel-kart-bot .card {
+    width: 100px; /* Zmniejsz szerokość */
+    height: 100px; /* Zmniejsz wysokość */
+    font-size: 12px; /* Zmniejsz czcionkę */
+}
+
+/* Kontener na ciało bota*/
+.panel-ciala-bot {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    position: fixed;
+    top: 30%;
+    left: 0;
+    right: 0;
+    padding: 10px;
+    background-color: rgba(44, 11, 11, 0.8);
+    height: 100px;
+
+}
+
+.panel-ciala-bot .card {
+    width: 100px; /* Zmniejsz szerokość */
+    height: 50px; /* Zmniejsz wysokość */
+    font-size: 12px; /* Zmniejsz czcionkę */
+}
+
+/* Kontener na ciało gracza*/
+.panel-ciala-gracz {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    position: fixed;
+    bottom: 30%;
+    left: 0;
+    right: 0;
+    padding: 10px;
+    background-color: rgba(181, 81, 182, 0.8);
+}
+
+.panel-ciala-gracz .card {
+    width: 100px; /* Zmniejsz szerokość */
+    height: 100px; /* Zmniejsz wysokość */
+    font-size: 12px; /* Zmniejsz czcionkę */
+}
+
+/* Kontener na karty gracza*/
+.panel-kart-gracz {
     display: flex;
     justify-content: center;
     align-items: flex-end;
@@ -16,8 +86,12 @@ body {
     left: 0;
     right: 0;
     padding: 10px;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(181, 81, 182, 0.8);
 }
+
+
+
+
 
 /* Pojedyncza karta */
 .card {
@@ -50,4 +124,38 @@ body {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
     transform: scale(1.05);
     transition: all 0.3s ease;
+}
+
+.gorny-pasek {
+    display: flex;
+    justify-content: space-between; /* Elementy zostaną rozmieszczone skrajnie */
+    align-items: center; /* Wyśrodkowanie w pionie */
+    padding: 10px; /* Opcjonalnie, dodanie odstępu wewnętrznego */
+    
+}
+
+.powrot {
+    background-color: #DA2580; /* Główny kolor przycisku */
+    color: white; /* Kolor tekstu */
+    border: none; /* Brak ramki */
+    border-radius: 8px; /* Zaokrąglone rogi */
+    padding: 10px 20px; /* Odstępy wewnętrzne */
+    font-size: 16px; /* Rozmiar czcionki */
+    font-weight: bold; /* Pogrubienie tekstu */
+    text-transform: uppercase; /* Wszystkie litery wielkie */
+    cursor: pointer; /* Zmiana kursora na wskaźnik */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Cień przycisku */
+    transition: all 0.3s ease; /* Płynne przejścia */
+}
+
+.powrot:hover {
+    background-color: #C0206F; /* Trochę ciemniejszy kolor na hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Większy cień */
+    transform: scale(1.05); /* Delikatne powiększenie */
+}
+
+.powrot:active {
+    background-color: #A5185D; /* Jeszcze ciemniejszy kolor podczas kliknięcia */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Mniejszy cień */
+    transform: scale(0.95); /* Delikatne zmniejszenie */
 }
