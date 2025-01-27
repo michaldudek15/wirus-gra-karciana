@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<h1>gra</h1>
+
+<div class="cards-container">
+    {% for card in player1_hand %}
+    <form method="POST" action="/playcard" class="card-form">
+        <button class="card"
+                type="submit"
+                name="card_name"
+                value="{{ card_name }}"
+                style="background: {% if card.color == 'joker' %}linear-gradient(to bottom, red, orange, yellow, green, blue, indigo, violet){% else %}{{ card.color }}{% endif %};">
+            <h3>{{ card.name }}</h3>
+        </button>
+    </form>
+    {% endfor %}
+</div>
+
+{% endblock %}

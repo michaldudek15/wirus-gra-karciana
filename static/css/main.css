@@ -1,0 +1,52 @@
+body {
+    margin-left: 10%;
+    margin-right: 10%;
+    font-family: sans-serif;
+}
+
+
+/* Kontener na karty */
+.cards-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Pojedyncza karta */
+.card {
+    width: 150px;
+    height: 200px;
+    margin: 0 10px;
+    padding: 10px;
+    border: 2px solid black;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    font-weight: bold;
+    color: white;
+    font-size: 15px;
+
+    /* Dodanie czarnej ramki wokół liter */
+    text-shadow: 
+        -1px -1px 0 #000,  /* Góra-lewo */
+        1px -1px 0 #000,   /* Góra-prawo */
+        -1px 1px 0 #000,   /* Dół-lewo */
+        1px 1px 0 #000;    /* Dół-prawo */
+}
+
+.card:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    transform: scale(1.05);
+    transition: all 0.3s ease;
+}
