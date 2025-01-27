@@ -9,7 +9,9 @@
 <h1>wirus - gra karciana</h1>
 
 <p><a href="{{ url_for('instrukcja') }}" class="button">instrukcja gry</a></p>
-<p><a href="{{ url_for('gra') }}" class="button">zacznij grę</a></p>
+<p><a href="{{ url_for('graSingleplayer') }}" class="button">zacznij grę z botem</a></p>
+<p><a href="{{ url_for('graMultiplayer') }}" class="button">zacznij grę z innymi graczami</a></p>
+<p><a href="{{ url_for('graHotseat') }}" class="button">zacznij grę w trybie hotseat</a></p>
 
 
 {% endblock %}

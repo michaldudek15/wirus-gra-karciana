@@ -19,9 +19,9 @@ def instrukcja():
     pdf_url = url_for('static', filename='pdf/wirus-instrukcja.pdf')
     return  render_template('instrukcja.html', pdf_url=pdf_url)
 
-# strona z grą
-@app.route('/gra')
-def gra():
+# strona z grą singleplayer z jednym botem
+@app.route('/zacznijGreSingleplayer')
+def graSingleplayer():
     gra = GameState()
     gra.deck = buildDeck()
     player1 = Player(1, "player1")
@@ -40,6 +40,13 @@ def gra():
 
     return  render_template('gra.html', player1_hand = player1.hand)
 
+@app.route('/zacznijGreMultiplayer')
+def graMultiplayer():
+    return render_template('todo.html')
+
+@app.route('/zacznijGreHotseat')
+def graHotseat():
+    return render_template('todo.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
