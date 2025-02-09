@@ -159,3 +159,21 @@ h1 {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Mniejszy cień */
     transform: scale(0.95); /* Delikatne zmniejszenie */
 }
+
+.card-placeholder {
+    width: 100px;
+    height: 100px;
+    margin: 0 10px;
+    padding: 10px;
+    border: 2px dashed #999;
+    border-radius: 8px;
+    background: #ddd;
+    color: #555;
+    text-align: center;
+    font-style: italic;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}

@@ -32,11 +32,20 @@
 </div>
 
 <div class="panel-ciala-gracz">
+    {% set sloty = 5 %}
+    {% set liczbaKartWCiele = player1.organsOnTable|length %}
+
     {% for card in player1.organsOnTable %}
     <div class="card"
         style="background: {% if card.color == 'joker' %}linear-gradient(to bottom, red, orange, yellow, green, blue, indigo, violet){% else %}{{ card.color }}{% endif %};">
     <h3>{{ card.name }}</h3>
     <p>status: {{ card.status }}</p>
+    </div>
+    {% endfor %}
+
+    {% for _ in range(sloty - liczbaKartWCiele) %}
+    <div class="card-placeholder">
+        <h3>puste</h3>
     </div>
     {% endfor %}
 </div>
