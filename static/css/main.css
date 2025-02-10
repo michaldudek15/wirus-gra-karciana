@@ -183,6 +183,16 @@ h1 {
     box-shadow: 0 0 20px #f302af;
 }
 
+
+#cancel-button-container {
+    position: fixed; 
+    top: 50%; 
+    left: 0; 
+    transform: 
+    translateY(-50%); 
+    z-index: 1000;
+}
+
 .cancel-button {
     padding: 10px 20px;
     background-color: #f44336;
@@ -192,6 +202,14 @@ h1 {
 }
 .cancel-button:hover {
     background-color: #d32f2f;
+}
+
+#accept-button-container {
+    position: fixed; 
+    top: 50%; 
+    right: 0; 
+    transform: translateY(-50%); 
+    z-index: 1000;
 }
 
 .accept-button {

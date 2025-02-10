@@ -3,7 +3,7 @@ import uuid
 class Card:
     "Bazowa klasa reprezentująca kartę."
     def __init__(self, name: str, description: str):
-        self.id = str(uuid.uuid4())
+        self.cardId = str(uuid.uuid4())
         self.name = name
         self.description = description
     
@@ -49,8 +49,8 @@ class Terapia(Card):
     
 class Player:
     "Klasa reprezentująca gracza."
-    def __init__(self, player_id: int, name: str):
-        self.id = str(uuid.uuid4())
+    def __init__(self, name: str):
+        self.playerId = str(uuid.uuid4())
         self.name = name
         self.hand = []  # Lista kart w ręce
         self.organsOnTable = {}  # Słownik: nazwa organu -> status

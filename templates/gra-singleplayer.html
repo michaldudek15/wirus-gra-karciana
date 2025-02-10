@@ -2,14 +2,14 @@
 
 {% block body %}
 
-<div id="cancel-button-container" style="position: fixed; top: 50%; left: 0; transform: translateY(-50%); z-index: 1000;">
+<div id="cancel-button-container">
     <button onclick="anulujWybor()" class="cancel-button">Anuluj wybór</button>
 </div>
 
-<div id="accept-button-container" style="position: fixed; top: 50%; right: 0; transform: translateY(-50%); z-index: 1000;">
+<div id="accept-button-container">
 
     <form method="POST" action="zagrajKarte" id="zagrajKarteForm">
-        
+        <input type="hidden" id="source_player_id" name="source_player_id" value="{{ player1.id }}">
         <input type="hidden" id="source_card_id" name="source_card_id" value="{{ source_card_id }}">
         <input type="hidden" id="target_card_id" name="target_card_id" value="{{ target_card_id }}">
 
@@ -164,12 +164,14 @@
         // Pobierz wartości z ukrytych pól
         var source = document.getElementById('source_card_id').value.trim();
         var target = document.getElementById('target_card_id').value.trim();
-        
+        var sourcePlayer = document.getElementById('source_player_id').value.trim();
+
+
         // Sprawdź, czy oba pola są wypełnione
         if (source === "" || target === "") {
             alert("Błąd: Nie wybrano karty źródłowej lub targetu!");
         } else {
-            alert("Zagrano karty: \nKarta źródłowa: " + source + "\nTarget: " + target);
+            alert("Zagrano karty: \nKarta źródłowa: " + source + "\nTarget: " + target + "\ngracz: " + sourcePlayer);
         }
     });
 </script>
