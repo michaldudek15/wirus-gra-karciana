@@ -1,10 +1,28 @@
 {% extends 'base.html' %}
 
 {% block body %}
+
+<div id="cancel-button-container" style="position: fixed; top: 50%; left: 0; transform: translateY(-50%); z-index: 1000;">
+    <button onclick="anulujWybor()" class="cancel-button">Anuluj wybór</button>
+</div>
+
+<div id="accept-button-container" style="position: fixed; top: 50%; right: 0; transform: translateY(-50%); z-index: 1000;">
+
+    <form method="POST" action="zagrajKarte">
+        
+        <input type="hidden" id="source_card_id" name="source_card_id" value="{{ source_card_id }}">
+        <input type="hidden" id="target_card_id" name="target_card_id" value="{{ target_card_id }}">
+
+        <button type="submit" class="accept-button">Akceptuj ruch</button>
+    </form>
+</div>
+
+
 <div class="gorny-pasek">
     <h1>gra singleplayer</h1>
-    <p class="powrot"><a href="{{ url_for('index') }}" class="button">powrót do strony głównej</a></p>
-
+    <p class="powrot">
+        <a href="{{ url_for('index') }}" class="button">powrót do strony głównej</a>
+    </p>
 </div>
 
 <div class="panel-kart-bot">
@@ -16,6 +34,7 @@
                 value="{{ card_name }}"
                 style="background: {% if card.color == 'joker' %}linear-gradient(to bottom, red, orange, yellow, green, blue, indigo, violet){% else %}{{ card.color }}{% endif %};">
             <h3>{{ card.name }}</h3>
+            <p>id: {{ card.id }}</p>
         </button>
     </form>
     {% endfor %}
@@ -24,9 +43,10 @@
 <div class="panel-ciala-bot">
     {% for card in player2.organsOnTable %}
     <div class="card"
-        style="background: {% if card.color == 'joker' %}linear-gradient(to bottom, red, orange, yellow, green, blue, indigo, violet){% else %}{{ card.color }}{% endif %};">
-    <h3>{{ card.name }}</h3>
-    <p>status: {{ card.status }}</p>
+         style="background: {% if card.color == 'joker' %}linear-gradient(to bottom, red, orange, yellow, green, blue, indigo, violet){% else %}{{ card.color }}{% endif %};">
+        <h3>{{ card.name }}</h3>
+        <p>status: {{ card.status }}</p>
+        <p>id: {{ card.id }}</p>
     </div>
     {% endfor %}
 </div>
@@ -35,33 +55,88 @@
     {% set sloty = 5 %}
     {% set liczbaKartWCiele = player1.organsOnTable|length %}
 
+    {# Karty w ciele gracza – kliknięcie ustawia target #}
     {% for card in player1.organsOnTable %}
-    <div class="card"
-        style="background: {% if card.color == 'joker' %}linear-gradient(to bottom, red, orange, yellow, green, blue, indigo, violet){% else %}{{ card.color }}{% endif %};">
-    <h3>{{ card.name }}</h3>
-    <p>status: {{ card.status }}</p>
+    <div class="card target" id="card_{{ card.id }}"
+         style="background: {% if card.color == 'joker' %}linear-gradient(to bottom, red, orange, yellow, green, blue, indigo, violet){% else %}{{ card.color }}{% endif %};"
+         onclick="wyborTargetu(this)">
+         <h3>{{ card.name }}</h3>
+         <p>status: {{ card.status }}</p>
+         <p>id: {{ card.id }}</p>
     </div>
     {% endfor %}
 
-    {% for _ in range(sloty - liczbaKartWCiele) %}
-    <div class="card-placeholder">
-        <h3>puste</h3>
+    {# Puste miejsca – unikalny id generowany z indeksem #}
+    {% for i in range(sloty - liczbaKartWCiele) %}
+    <div class="card-placeholder target" id="card_000_{{ i }}"
+         onclick="wyborTargetu(this)">
+         <h3>puste</h3>
     </div>
     {% endfor %}
 </div>
 
 <div class="panel-kart-gracz">
     {% for card in player1.hand %}
-    <form method="POST" action="/zagrajKarte" class="card-form">
-        <button class="card"
-                type="submit"
-                name="card_name"
-                value="{{ card_name }}"
-                style="background: {% if card.color == 'joker' %}linear-gradient(to bottom, red, orange, yellow, green, blue, indigo, violet){% else %}{{ card.color }}{% endif %};">
-            <h3>{{ card.name }}</h3>
-        </button>
-    </form>
+    <div class="card" id="card_{{ card.id }}"
+         style="background: {% if card.color == 'joker' %}linear-gradient(to bottom, red, orange, yellow, green, blue, indigo, violet){% else %}{{ card.color }}{% endif %};"
+         onclick="wybor('{{ card.id }}')">
+        <h3>{{ card.name }}</h3>
+        <p>{{ card.id }}</p>
+    </div>
     {% endfor %}
 </div>
 
+<script>
+    function wybor(cardId) {
+        console.log("wybrano kartę o id: " + cardId);
+        var cards = document.querySelectorAll('.panel-kart-gracz .card');
+        cards.forEach(function(card) {
+            card.classList.remove('highlight');
+        });
+        var selectedCard = document.getElementById("card_" + cardId);
+        if(selectedCard) {
+            selectedCard.classList.add('highlight');
+        }
+    }
+    
+    function wyborTargetu(elem) {
+        console.log("wybrano target:", elem.id);
+        var targets = document.querySelectorAll('.panel-ciala-gracz .target');
+        targets.forEach(function(target) {
+            target.classList.remove('highlight');
+        });
+        elem.classList.add('highlight');
+    }
+    
+    function anulujWybor() {
+        console.log("Anulowano wybór");
+        
+        // Usuń podświetlenie z kart w ręce
+        var handCards = document.querySelectorAll('.panel-kart-gracz .card.highlight');
+        handCards.forEach(function(card) {
+            card.classList.remove('highlight');
+        });
+        
+        // Usuń podświetlenie z targetów (kart i pustych miejsc w ciele)
+        var targets = document.querySelectorAll('.panel-ciala-gracz .target.highlight');
+        targets.forEach(function(target) {
+            target.classList.remove('highlight');
+        });
+    }
+</script>
+
+<script>
+    document.getElementById('zagrajKarteForm').addEventListener('submit', function(event) {
+        // Pobierz wartości z ukrytych pól
+        var source = document.getElementById('source_card_id').value.trim();
+        var target = document.getElementById('target_card_id').value.trim();
+        
+        // Sprawdź, czy oba pola są wypełnione
+        if(source === "" || target === "") {
+            // Zatrzymaj wysłanie formularza
+            event.preventDefault();
+            alert("Błąd: Nie wybrano karty źródłowej lub targetu!");
+        }
+    });
+</script>
 {% endblock %}

@@ -177,3 +177,30 @@ h1 {
     align-items: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
+
+.highlight {
+    border: 10px solid #f302af;  /* złote obramowanie */
+    box-shadow: 0 0 20px #f302af;
+}
+
+.cancel-button {
+    padding: 10px 20px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+.cancel-button:hover {
+    background-color: #d32f2f;
+}
+
+.accept-button {
+    padding: 10px 20px;
+    background-color: #11f30d;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+.accept-button:hover {
+    background-color: #128a09;
+}

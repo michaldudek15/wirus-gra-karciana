@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from deck import buildDeck
 from models import Card, Organ, Wirus, Szczepionka, Terapia, Player, GameState
@@ -6,7 +6,6 @@ from models import Card, Organ, Wirus, Szczepionka, Terapia, Player, GameState
 app = Flask(__name__)
 #app.config['SQLALCHEMY_DATABASE_URL'] = 'sqlite:///test.db'
 #db = SQLAlchemy(app)
-
 
 # strona tytułowa
 @app.route('/')
@@ -55,6 +54,10 @@ def graMultiplayer():
 @app.route('/zacznijGreHotseat')
 def graHotseat():
     return render_template('todo.html')
+
+@app.route('/wybierzKarte', methods=['POST'])
+def wybierzKarte():
+    global wybranaKarta
 
 # @app.route('/zagrajKarte', methods=['POST'])
 # def zagrajKarte():
