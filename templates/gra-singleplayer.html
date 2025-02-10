@@ -8,7 +8,7 @@
 
 <div id="accept-button-container" style="position: fixed; top: 50%; right: 0; transform: translateY(-50%); z-index: 1000;">
 
-    <form method="POST" action="zagrajKarte">
+    <form method="POST" action="zagrajKarte" id="zagrajKarteForm">
         
         <input type="hidden" id="source_card_id" name="source_card_id" value="{{ source_card_id }}">
         <input type="hidden" id="target_card_id" name="target_card_id" value="{{ target_card_id }}">
@@ -89,13 +89,23 @@
 <script>
     function wybor(cardId) {
         console.log("wybrano kartę o id: " + cardId);
+    
+        // Usuń podświetlenie ze wszystkich kart w ręce
         var cards = document.querySelectorAll('.panel-kart-gracz .card');
         cards.forEach(function(card) {
             card.classList.remove('highlight');
         });
+        
+        // Dodaj podświetlenie do wybranej karty
         var selectedCard = document.getElementById("card_" + cardId);
-        if(selectedCard) {
+        if (selectedCard) {
             selectedCard.classList.add('highlight');
+        }
+        
+        // Ustaw wartość ukrytego pola formularza source_card_id na cardId
+        var sourceInput = document.getElementById('source_card_id');
+        if (sourceInput) {
+            sourceInput.value = cardId;
         }
     }
     
@@ -106,6 +116,16 @@
             target.classList.remove('highlight');
         });
         elem.classList.add('highlight');
+    
+        // Jeśli chcesz przekazać cały id elementu:
+        // var targetId = elem.id;
+        // Jeśli chcesz usunąć prefiks "card_", aby uzyskać tylko numer lub unikalny identyfikator:
+        var targetId = elem.id.replace("card_", "");
+    
+        var targetInput = document.getElementById('target_card_id');
+        if (targetInput) {
+            targetInput.value = targetId;
+        }
     }
     
     function anulujWybor() {
@@ -122,20 +142,34 @@
         targets.forEach(function(target) {
             target.classList.remove('highlight');
         });
+
+         // Wyczyszczenie wartości ukrytych pól formularza
+        var sourceInput = document.getElementById('source_card_id');
+        if (sourceInput) {
+            sourceInput.value = "";
+        }
+        var targetInput = document.getElementById('target_card_id');
+        if (targetInput) {
+            targetInput.value = "";
+        }
     }
 </script>
 
+
 <script>
     document.getElementById('zagrajKarteForm').addEventListener('submit', function(event) {
+        // Zatrzymujemy wysyłkę formularza, aby pokazać alert
+        event.preventDefault();
+        
         // Pobierz wartości z ukrytych pól
         var source = document.getElementById('source_card_id').value.trim();
         var target = document.getElementById('target_card_id').value.trim();
         
         // Sprawdź, czy oba pola są wypełnione
-        if(source === "" || target === "") {
-            // Zatrzymaj wysłanie formularza
-            event.preventDefault();
+        if (source === "" || target === "") {
             alert("Błąd: Nie wybrano karty źródłowej lub targetu!");
+        } else {
+            alert("Zagrano karty: \nKarta źródłowa: " + source + "\nTarget: " + target);
         }
     });
 </script>

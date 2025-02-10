@@ -50,7 +50,7 @@ class Terapia(Card):
 class Player:
     "Klasa reprezentująca gracza."
     def __init__(self, player_id: int, name: str):
-        self.player_id = player_id
+        self.id = str(uuid.uuid4())
         self.name = name
         self.hand = []  # Lista kart w ręce
         self.organsOnTable = {}  # Słownik: nazwa organu -> status
@@ -111,6 +111,7 @@ class Player:
 class GameState:
     "Klasa reprezentująca aktualny stan gry."
     def __init__(self):
+        self.gameId = str(uuid.uuid4())
         self.players = []
         self.currentPlayerId = 0
         self.deck = []  
