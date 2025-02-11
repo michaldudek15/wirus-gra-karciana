@@ -77,7 +77,7 @@ class Player:
             self.hand.remove(card)
             self.drawCard(deck)
 
-    def playCard(self, card: Card, deck: list, discardPile: list, target=None):
+    def playCard(self, card: Card, deck: list, discardPile: list, target=None, targetPlayer=None):
         "Zagraj kartę z ręki."
         if card not in self.hand:
             raise ValueError(f"Karta {card.name} nie znajduje się w ręce gracza!")
@@ -104,9 +104,67 @@ class Player:
                 print(f"{self.name} zagrał organ {card.name}.")
                 self.drawCard(deck)
         
-        # TODO
+
         elif isinstance(card, Szczepionka):
             print("ZAGRANIE SZCZEPIONKI\n")
+            
+            # Sprawdzenie, czy został przekazany cel (organ)
+            if target is None:
+                print("Nie wybrano celu dla szczepionki!")
+                return -1
+
+            # Upewniamy się, że cel jest organem
+            if not isinstance(target, Organ):
+                print("Cel nie jest organem!")
+                return -1
+
+            # Ustalamy, do którego stołu należy cel:
+            # Jeśli targetPlayer nie został podany, przyjmujemy, że gra na własne ciało.
+            # Jeśli targetPlayer został podany, używamy go jako właściciela docelowego.
+            tableOwner = self if targetPlayer is None else targetPlayer
+
+            # Sprawdzamy, czy wybrany organ faktycznie znajduje się na stole docelowego gracza
+            if target not in tableOwner.organsOnTable:
+                print(f"Organ {target.name} nie znajduje się na stole gracza {tableOwner.name}!")
+                return -1
+
+            if card.color != 'joker' and card.color != target.color:
+                print(f"Szczepionkę koloru {card.color} można zagrać tylko na organ o kolorze {card.color}!")
+                return -1
+
+            current_status = tableOwner.organsOnTable[target]
+
+            # Nie można zagrać szczepionki na uodporniony organ
+            if current_status == "uodporniony":
+                print("Szczepionki nie można zagrać na uodporniony organ!")
+                return -1
+
+            # Zmieniamy status organu zgodnie z zasadami:
+            # - ze sterylnego na zaszczepiony,
+            # - ze zaszczepionego na uodporniony,
+            # - ze zawirusowanego na sterylny.
+            if current_status == "sterylny":
+                new_status = "zaszczepiony"
+            elif current_status == "zaszczepiony":
+                new_status = "uodporniony"
+            elif current_status == "zawirusowany":
+                new_status = "sterylny"
+            else:
+                print("Nieznany status organu!")
+                return -1
+
+            # Aktualizujemy status organu w słowniku właściciela oraz w samym obiekcie
+            tableOwner.organsOnTable[target] = new_status
+            target.status = new_status
+
+            # Usuwamy kartę szczepionki z ręki i dodajemy ją do stosu odrzuconych
+            self.hand.remove(card)
+            discardPile.append(card)
+            self.drawCard(deck)
+
+            print(f"{self.name} zagrał szczepionkę na organ {target.name} gracza {tableOwner.name}. Organ zmienił status z {current_status} na {new_status}.")
+            return 0
+
 
         # TODO
         elif isinstance(card, Wirus):

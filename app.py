@@ -78,6 +78,8 @@ def zagrajKarte():
     print("Target player id:", target_player_id)
     print("Target card id:  ", target_card_id)
 
+    komunikat = ""
+
     gra = session.get('gra')
     if not gra:
         print ("brak stanu gry w sesji")
@@ -90,16 +92,28 @@ def zagrajKarte():
         if card.cardId == source_card_id:
             source_card = card
             break
+    
+    organy = targetPlayer.organsOnTable.keys()
+
+    target_card = None
+    for card in organy:
+        if card.cardId == target_card_id:
+            target_card = card
+            break
 
     if source_card is None:
         print("Nie znaleziono karty o id:", source_card_id)
         return "Błąd: Karta nie została znaleziona", 400
 
-    if (sourcePlayer.playCard(source_card, gra.deck, gra.discardPile) == -1):
-        komunikat = "niedozwolony ruch"
-    else:
-        komunikat = ""
-
+    if isinstance(source_card, Organ):
+        if (sourcePlayer.playCard(source_card, gra.deck, gra.discardPile) == -1):
+            komunikat = "niedozwolony ruch"
+    
+    elif isinstance(source_card, Szczepionka):
+        if target_card_id == "placeholder":
+            komunikat = "Nie wybrano celu dla szczepionki!"
+        elif sourcePlayer.playCard(source_card, gra.deck, gra.discardPile, target_card, targetPlayer) == -1:
+            komunikat = "niedozwolony ruch"
 
     print(gra)
     session['gra'] = gra

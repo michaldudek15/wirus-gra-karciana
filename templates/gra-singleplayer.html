@@ -230,14 +230,7 @@
         alert(komunikat);
     }
 
-</script>
-
-
-<!-- <script>
-    
-    sprawdzenie wartości w formularzu
-
- document.getElementById('zagrajKarteForm').addEventListener('submit', function(event) {
+    document.getElementById('zagrajKarteForm').addEventListener('submit', function(event) {
         // Zatrzymujemy wysyłkę formularza, aby pokazać alert
         event.preventDefault();
         
@@ -252,9 +245,19 @@
         if (source === "" || target === "") {
             alert("Błąd: Nie wybrano karty źródłowej lub targetu!");
         } else {
-            alert("szczegóły ruchu: \ngracz źródłowy: " + sourcePlayer + "\nKarta źródłowa: " + source + "\nkarta targetowana: " + target + "\ngracz targetowany: " + targetPlayer);
+            // alert("szczegóły ruchu: \ngracz źródłowy: " + sourcePlayer + "\nKarta źródłowa: " + source + "\nkarta targetowana: " + target + "\ngracz targetowany: " + targetPlayer);
+            event.target.submit();
         }
     });
+
+</script>
+
+
+<!-- <script>
+    
+    sprawdzenie wartości w formularzu
+
+
     
 </script> -->
 {% endblock %}
