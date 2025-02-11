@@ -104,7 +104,7 @@ class Player:
         self.drawCard(deck)
 
     def __repr__(self):
-        return (f"Player(player_id={self.player_id}, name={self.name}, "
+        return (f"Player(playerId={self.playerId}, name={self.name}, "
                 f"hand={[card.name for card in self.hand]})")
 
 

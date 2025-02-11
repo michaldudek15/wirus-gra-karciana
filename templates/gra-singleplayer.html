@@ -9,22 +9,25 @@
     </p>
 </div>
 
-<div class="panel-kart" id="panel-kart-bot">
+<div class="panel-kart" id="panel-kart-bot" data-playerid="{{ player2.playerId}}">
     {% for card in player2.hand %}
     <div class="karta-reka"
-         style="background: {% if card.color == 'joker' %}linear-gradient(to bottom, red, orange, yellow, green, blue, indigo, violet){% else %}{{ card.color }}{% endif %};">
-        <h3>{{ card.name }}</h3>
+        id="{{ card.cardId }}"
+         style="background: {% if card.color == 'joker' %}linear-gradient(to bottom, red, orange, yellow, green, blue, indigo, violet){% else %}{{ card.color }}{% endif %};"
+         onclick="wybor(this)">
+         <h3>{{ card.name }}</h3>
         <p>id: {{ card.cardId }}</p>
     </div>
     {% endfor %}
 </div>
 
-<div class="panel-ciala" id="panel-ciala-bot">
+<div class="panel-ciala" id="panel-ciala-bot" data-playerid="{{ player2.playerId}}">
     {% set sloty = 5 %}
     {% set liczbaKartWCiele = player2.organsOnTable|length %}
 
     {% for card in player2.organsOnTable %}
     <div class="karta-cialo"
+        id="{{ card.cardId }}"
          style="background: {% if card.color == 'joker' %}linear-gradient(to bottom, red, orange, yellow, green, blue, indigo, violet){% else %}{{ card.color }}{% endif %};"
          onclick="wyborTargetu(this)">
          <h3>{{ card.name }}</h3>
@@ -35,7 +38,7 @@
 
     {# Puste miejsca – unikalny id generowany z indeksem #}
     {% for i in range(sloty - liczbaKartWCiele) %}
-    <div class="karta-placeholder" id="card_000_{{ i }}"
+    <div class="karta-placeholder" id="placeholder"
          onclick="wyborTargetu(this)">
          <h3>puste</h3>
     </div>
@@ -47,20 +50,22 @@
 </div>
 
 <div class="przycisk-container" >
-    <form method="POST" action="graczZagrajKarte" id="graczZagrajKarteForm">
-        <input type="hidden" id="source_player_id" name="source_player_id" value="{{ player1.id }}">
-        <input type="hidden" id="source_card_id" name="source_card_id" value="{{ source_card_id }}">
-        <input type="hidden" id="target_card_id" name="target_card_id" value="{{ target_card_id }}">
+    <form method="POST" action="zagrajKarte" id="zagrajKarteForm">
+        <input type="hidden" id="source_player_id" name="source_player_id" value="">
+        <input type="hidden" id="source_card_id" name="source_card_id" value="">
+        <input type="hidden" id="target_player_id" name="target_player_id" value="">
+        <input type="hidden" id="target_card_id" name="target_card_id" value="">
         <button type="submit" class="przycisk" id="przycisk-akceptuj">Akceptuj ruch</button>
     </form>
 </div>
 
-<div class="panel-ciala" id="panel-ciala-gracz">
+<div class="panel-ciala" id="panel-ciala-gracz" data-playerid="{{ player1.playerId}}">
     {% set sloty = 5 %}
     {% set liczbaKartWCiele = player1.organsOnTable|length %}
 
     {% for card in player1.organsOnTable %}
     <div class="karta-cialo"
+        id="{{ card.cardId }}"
          style="background: {% if card.color == 'joker' %}linear-gradient(to bottom, red, orange, yellow, green, blue, indigo, violet){% else %}{{ card.color }}{% endif %};"
          onclick="wyborTargetu(this)">
          <h3>{{ card.name }}</h3>
@@ -71,18 +76,19 @@
 
     {# Puste miejsca – unikalny id generowany z indeksem #}
     {% for i in range(sloty - liczbaKartWCiele) %}
-    <div class="karta-placeholder" id="card_000_{{ i }}"
+    <div class="karta-placeholder" id="placeholder"
          onclick="wyborTargetu(this)">
          <h3>puste</h3>
     </div>
     {% endfor %}
 </div>
 
-<div class="panel-kart" id="panel-kart-gracz">
+<div class="panel-kart" id="panel-kart-gracz" data-playerid="{{ player1.playerId}}">
     {% for card in player1.hand %}
     <div class="karta-reka"
+        id="{{ card.cardId }}"
          style="background: {% if card.color == 'joker' %}linear-gradient(to bottom, red, orange, yellow, green, blue, indigo, violet){% else %}{{ card.color }}{% endif %};"
-         onclick="wybor('{{ card.cardId }}')">
+         onclick="wybor(this)">
         <h3>{{ card.name }}</h3>
         <p>{{ card.cardId }}</p>
     </div>
@@ -90,118 +96,147 @@
 </div>
 
 <script>
-    function wybor(cardId) {
-        console.log("Wybrano kartę o id: " + cardId);
-    
-        // Usuń podświetlenie ze wszystkich kart gracza
-        var cards = document.querySelectorAll('#panel-kart-gracz .karta-reka');
+    function wybor(elem) {
+        // Pobierz kontener, w którym znajduje się karta (np. panel-kart-gracz lub panel-kart-bot)
+        var container = elem.closest('.panel-kart');
+        var playerId = container ? container.getAttribute('data-playerid') : "";
+        console.log("Wybrano kartę źródłową o id: " + elem.id + " gracza o id: " + playerId);
+
+        // Jeśli kliknięta karta jest już zaznaczona, usuń podświetlenie i wyczyść ukryte pola formularza
+        if (elem.classList.contains('highlight')) {
+            elem.classList.remove('highlight');
+            var sourceCardInput = document.getElementById('source_card_id');
+            if (sourceCardInput) {
+                sourceCardInput.value = "";
+            }
+            var sourcePlayerInput = document.getElementById('source_player_id');
+            if (sourcePlayerInput) {
+                sourcePlayerInput.value = "";
+            }
+            return;
+        }
+
+        // Usuń podświetlenie ze wszystkich kart we wszystkich panelach rąk
+        var cards = document.querySelectorAll('.panel-kart .karta-reka');
         cards.forEach(function(card) {
             card.classList.remove('highlight');
         });
-        
-        // Dodaj podświetlenie do wybranej karty
-        // Jeśli identyfikatory kart zmieniły format na "card-{cardId}"
-        var selectedCard = document.getElementById("card-" + cardId);
-        if (selectedCard) {
-            selectedCard.classList.add('highlight');
-        }
-        
-        // Ustaw wartość ukrytego pola formularza source_card_id na cardId
-        var sourceInput = document.getElementById('source_card_id');
-        if (sourceInput) {
-            sourceInput.value = cardId;
-        }
-    }
-</script>
 
-
-<!-- <script>
-    function wybor(cardId) {
-        console.log("wybrano kartę o id: " + cardId);
-    
-        // Usuń podświetlenie ze wszystkich kart w ręce
-        var cards = document.querySelectorAll('.panel-kart-gracz .card');
-        cards.forEach(function(card) {
-            card.classList.remove('highlight');
-        });
-        
-        // Dodaj podświetlenie do wybranej karty
-        var selectedCard = document.getElementById("card_" + cardId);
-        if (selectedCard) {
-            selectedCard.classList.add('highlight');
-        }
-        
-        // Ustaw wartość ukrytego pola formularza source_card_id na cardId
-        var sourceInput = document.getElementById('source_card_id');
-        if (sourceInput) {
-            sourceInput.value = cardId;
-        }
-    }
-    
-    function wyborTargetu(elem) {
-        console.log("wybrano target:", elem.id);
-        var targets = document.querySelectorAll('.panel-ciala-gracz .target');
-        targets.forEach(function(target) {
-            target.classList.remove('highlight');
-        });
+        // Podświetl klikniętą kartę
         elem.classList.add('highlight');
-    
-        // Jeśli chcesz przekazać cały id elementu:
-        // var targetId = elem.id;
-        // Jeśli chcesz usunąć prefiks "card_", aby uzyskać tylko numer lub unikalny identyfikator:
-        var targetId = elem.id.replace("card_", "");
-    
-        var targetInput = document.getElementById('target_card_id');
-        if (targetInput) {
-            targetInput.value = targetId;
+
+        // Uzupełnij wartości w formularzu:
+        // - id źródłowej karty
+        // - id źródłowego gracza
+        var sourceCardInput = document.getElementById('source_card_id');
+        if (sourceCardInput) {
+            sourceCardInput.value = elem.id;
+        }
+        var sourcePlayerInput = document.getElementById('source_player_id');
+        if (sourcePlayerInput) {
+            sourcePlayerInput.value = playerId;
         }
     }
-    
-    function anulujWybor() {
-        console.log("Anulowano wybór");
-        
-        // Usuń podświetlenie z kart w ręce
-        var handCards = document.querySelectorAll('.panel-kart-gracz .card.highlight');
-        handCards.forEach(function(card) {
-            card.classList.remove('highlight');
-        });
-        
-        // Usuń podświetlenie z targetów (kart i pustych miejsc w ciele)
-        var targets = document.querySelectorAll('.panel-ciala-gracz .target.highlight');
+
+    function wyborTargetu(elem) {
+        // Pobierz najbliższy kontener panelu ciała, żeby odczytać atrybut data-playerid
+        var container = elem.closest('.panel-ciala');
+        var playerId = container ? container.getAttribute('data-playerid') : "";
+
+        console.log("Wybrano kartę o id: " + elem.id + " gracza o id: " + playerId);
+
+
+        // Jeśli kliknięty element jest już podświetlony, to usuń podświetlenie oraz wyczyść ukryte pola
+        if (elem.classList.contains('highlight')) {
+            elem.classList.remove('highlight');
+
+            var targetCardInput = document.getElementById('target_card_id');
+            if (targetCardInput) {
+                targetCardInput.value = "";
+            }
+            var targetPlayerInput = document.getElementById('target_player_id');
+            if (targetPlayerInput) {
+                targetPlayerInput.value = "";
+            }
+            return;
+        }
+
+        // Usuń podświetlenie ze wszystkich elementów docelowych (we wszystkich panelach ciała)
+        var targets = document.querySelectorAll('.panel-ciala .karta-cialo, .panel-ciala .karta-placeholder');
         targets.forEach(function(target) {
             target.classList.remove('highlight');
         });
 
-         // Wyczyszczenie wartości ukrytych pól formularza
-        var sourceInput = document.getElementById('source_card_id');
-        if (sourceInput) {
-            sourceInput.value = "";
+        // Podświetl kliknięty element
+        elem.classList.add('highlight');
+
+        // Ustaw wartość ukrytego pola target_card_id:
+        // Jeśli kliknięty element to placeholder, nie ustawiamy id karty (pozostawiamy placeholder)
+        // Jeśli to karta – ustawiamy jej id
+        var targetCardInput = document.getElementById('target_card_id');
+        if (targetCardInput) {
+            if (elem.classList.contains('karta-placeholder')) {
+                targetCardInput.value = "placeholder";
+            } else {
+                targetCardInput.value = elem.id;
+            }
         }
-        var targetInput = document.getElementById('target_card_id');
-        if (targetInput) {
-            targetInput.value = "";
+
+        // Ustaw wartość ukrytego pola target_player_id na id gracza pobrane z kontenera
+        var targetPlayerInput = document.getElementById('target_player_id');
+        if (targetPlayerInput) {
+            targetPlayerInput.value = playerId;
         }
     }
-</script>
 
-
-<script>
     document.getElementById('zagrajKarteForm').addEventListener('submit', function(event) {
         // Zatrzymujemy wysyłkę formularza, aby pokazać alert
         event.preventDefault();
         
         // Pobierz wartości z ukrytych pól
-        var source = document.getElementById('source_card_id').value.trim();
-        var target = document.getElementById('target_card_id').value.trim();
         var sourcePlayer = document.getElementById('source_player_id').value.trim();
+        var source = document.getElementById('source_card_id').value.trim();
+        var targetPlayer = document.getElementById('target_player_id').value.trim();
+        var target = document.getElementById('target_card_id').value.trim();
 
 
         // Sprawdź, czy oba pola są wypełnione
         if (source === "" || target === "") {
             alert("Błąd: Nie wybrano karty źródłowej lub targetu!");
         } else {
-            alert("Zagrano karty: \nKarta źródłowa: " + source + "\nTarget: " + target + "\ngracz: " + sourcePlayer);
+            alert("szczegóły ruchu: \ngracz źródłowy: " + sourcePlayer + "\nKarta źródłowa: " + source + "\nkarta targetowana: " + target + "\ngracz targetowany: " + targetPlayer);
         }
     });
+
+    function anulujWybor() {
+        // Usuń podświetlenia ze wszystkich elementów
+        var highlightedElements = document.querySelectorAll('.highlight');
+        highlightedElements.forEach(function(element) {
+            element.classList.remove('highlight');
+        });
+
+        // Wyczyść wartości w formularzu
+        var sourcePlayerInput = document.getElementById('source_player_id');
+        var sourceCardInput = document.getElementById('source_card_id');
+        var targetPlayerInput = document.getElementById('target_player_id');
+        var targetCardInput = document.getElementById('target_card_id');
+        
+        if (sourcePlayerInput) { sourcePlayerInput.value = ""; }
+        if (sourceCardInput) { sourceCardInput.value = ""; }
+        if (targetPlayerInput) { targetPlayerInput.value = ""; }
+        if (targetCardInput) { targetCardInput.value = ""; }
+
+        console.log("Anulowano wybór, wszystkie podświetlenia i wartości formularza zostały usunięte.");
+    }
+</script>
+
+
+<!-- <script>
+    
+</script>
+
+
+<script>
+    
 </script> -->
 {% endblock %}
