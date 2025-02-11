@@ -23,9 +23,9 @@ def instrukcja():
     pdf_url = url_for('static', filename='pdf/wirus-instrukcja.pdf')
     return  render_template('instrukcja.html', pdf_url=pdf_url)
 
-# strona z grą singleplayer z jednym botem
-@app.route('/zacznijGreSingleplayer')
-def graSingleplayer():
+# strona z grą hotseat z innym graczem
+@app.route('/zacznijGreHotseat')
+def graHotseat():
     gra = GameState()
     gra.deck = buildDeck()
 
@@ -56,14 +56,14 @@ def graSingleplayer():
     session['player2'] = player2
     session['activePlayer'] = gra.activePlayer()
 
-    return  render_template('gra-singleplayer.html', player1 = player1, player2 = player2, activePlayer = gra.activePlayer())
+    return  render_template('graHotseat.html', player1 = player1, player2 = player2, activePlayer = gra.activePlayer())
 
 @app.route('/zacznijGreMultiplayer')
 def graMultiplayer():
     return render_template('todo.html')
 
-@app.route('/zacznijGreHotseat')
-def graHotseat():
+@app.route('/zacznijGreZBotem')
+def graZBotem():
     return render_template('todo.html')
 
 @app.route('/zagrajKarte', methods=['POST'])
@@ -143,7 +143,7 @@ def zagrajKarte():
         return render_template('game-over.html', zwyciezca=zwyciezca, komunikat=komunikat)
 
 
-    return  render_template('gra-singleplayer.html', player1 = player1, player2 = player2, komunikat = komunikat, activePlayer = activePlayer)
+    return  render_template('graHotseat.html', player1 = player1, player2 = player2, komunikat = komunikat, activePlayer = activePlayer)
 
 @app.route('/wymienKarty', methods=['POST'])
 def wymienKarty():
@@ -155,13 +155,13 @@ def wymienKarty():
     gra = session.get('gra')
     if not gra:
         flash("Brak stanu gry w sesji!", "error")
-        return redirect(url_for('graSingleplayer'))
+        return redirect(url_for('graHotseat'))
     
         # Pobierz gracza, który chce wymienić karty
     sourcePlayer = gra.players.get(source_player_id)
     if not sourcePlayer:
         flash("Nie znaleziono gracza o podanym id!", "error")
-        return redirect(url_for('graSingleplayer'))
+        return redirect(url_for('graHotseat'))
     
     # Budujemy listę identyfikatorów kart do wymiany
     card_ids = [first_card_id, second_card_id, third_card_id]
@@ -172,7 +172,7 @@ def wymienKarty():
             card = next((c for c in sourcePlayer.hand if c.cardId == cid), None)
             if not card:
                 flash(f"Karta o id {cid} nie znajduje się w ręce gracza!", "error")
-                return redirect(url_for('graSingleplayer'))
+                return redirect(url_for('graHotseat'))
             cards_to_exchange.append(card)
     
     # Wykonaj wymianę kart (odrzuć wybrane karty, dobierz nowe)
@@ -183,7 +183,7 @@ def wymienKarty():
     session['gra'] = gra
     player1 = session.get('player1')
     player2 = session.get('player2')    
-    return  render_template('gra-singleplayer.html', player1 = player1, player2 = player2)
+    return  render_template('graHotseat.html', player1 = player1, player2 = player2)
 
 # @app.route('/botZagrajKarte', methods=['POST'])
 # def zagrajKarte():

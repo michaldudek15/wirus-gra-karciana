@@ -118,7 +118,7 @@ class Player:
                 print("Cel nie jest organem!")
                 return -1
 
-            # Ustalamy właściciela stołu – jeśli targetPlayer nie został podany, przyjmujemy własnego gracza
+            # Ustalamy właściciela stołu – jeśli targetPlayer nie został przekazany, przyjmujemy, że to gracz wykonujący ruch
             tableOwner = self if targetPlayer is None else targetPlayer
 
             # Sprawdzamy, czy wybrany organ znajduje się na stole docelowego gracza
@@ -126,8 +126,12 @@ class Player:
                 print(f"Organ {target.name} nie znajduje się na stole gracza {tableOwner.name}!")
                 return -1
 
-            # (Usunięto sprawdzanie zgodności koloru – teraz można zagrać szczepionkę dowolnego koloru)
-            
+            # Sprawdzanie koloru:
+            # Jeśli szczepionka nie jest jokerem i organ nie jest jokerem, to ich kolory muszą się zgadzać.
+            if card.color != 'joker' and target.color != 'joker' and card.color != target.color:
+                print(f"Szczepionkę koloru {card.color} można zagrać tylko na organ o kolorze {card.color}!")
+                return -1
+
             current_status = tableOwner.organsOnTable[target]
 
             # Nie można zagrać szczepionki na uodporniony organ
@@ -146,11 +150,11 @@ class Player:
                 print("Nieznany status organu!")
                 return -1
 
-            # Aktualizacja statusu organu
+            # Aktualizujemy status organu
             tableOwner.organsOnTable[target] = new_status
             target.status = new_status
 
-            # Usuwamy kartę szczepionki z ręki, dodajemy do stosu odrzuconych i dobieramy nową kartę
+            # Usuwamy kartę szczepionki z ręki, dodajemy ją do stosu odrzuconych i dobieramy nową kartę
             self.hand.remove(card)
             discardPile.append(card)
             self.drawCard(deck)
@@ -161,7 +165,7 @@ class Player:
 
         elif isinstance(card, Wirus):
             print("ZAGRANIE WIRUSA\n")
-            
+                    
             # Sprawdzenie, czy został przekazany cel
             if target is None:
                 print("Nie wybrano celu dla wirusa!")
@@ -172,7 +176,7 @@ class Player:
                 print("Cel nie jest organem!")
                 return -1
 
-            # Ustalamy właściciela stołu
+            # Ustalamy właściciela stołu – jeśli targetPlayer nie został przekazany, przyjmujemy, że to gracz wykonujący ruch
             tableOwner = self if targetPlayer is None else targetPlayer
 
             # Sprawdzamy, czy wybrany organ znajduje się na stole docelowego gracza
@@ -180,8 +184,12 @@ class Player:
                 print(f"Organ {target.name} nie znajduje się na stole gracza {tableOwner.name}!")
                 return -1
 
-            # (Usunięto sprawdzanie zgodności koloru – teraz można zagrać wirusa dowolnego koloru)
-            
+            # Sprawdzanie koloru:
+            # Jeśli wirus nie jest jokerem i organ nie jest jokerem, to ich kolory muszą się zgadzać.
+            if card.color != 'joker' and target.color != 'joker' and card.color != target.color:
+                print(f"Wirusa koloru {card.color} można zagrać tylko na organ o kolorze {card.color}!")
+                return -1
+
             current_status = tableOwner.organsOnTable[target]
 
             # Nie można zagrać wirusa na uodporniony organ
