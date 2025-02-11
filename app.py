@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, request, redirect, flash
+from flask import Flask, render_template, url_for, request, redirect, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from deck import buildDeck
 from models import Card, Organ, Wirus, Szczepionka, Terapia, Player, GameState
@@ -58,13 +58,13 @@ def graMultiplayer():
 def graHotseat():
     return render_template('todo.html')
 
-@app.route('/wybierzKarte', methods=['POST'])
-def wybierzKarte():
-    pass
+# @app.route('/graczZagrajKarte', methods=['POST'])
+# def zagrajKarte():
+#    pass
 
-@app.route('/zagrajKarte', methods=['POST'])
-def zagrajKarte():
-   pass
+# @app.route('/botZagrajKarte', methods=['POST'])
+# def zagrajKarte():
+#    pass
 
 if __name__ == "__main__":
     app.run(debug=True)

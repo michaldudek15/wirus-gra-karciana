@@ -7,7 +7,6 @@ body {
 
 h1 {
     color: #DA2580;
-
     text-shadow: 
     -1px -1px 0 #ffffff,  /* Góra-lewo */
     1px -1px 0 #ffffff,   /* Góra-prawo */
@@ -15,152 +14,170 @@ h1 {
     1px 1px 0 #ffffff;    /* Dół-prawo */
 }
 
-/* Kontener na karty bota*/
-.panel-kart-bot {
-    visibility: visible; /* tutaj zmienić potem*/
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    position: fixed;
-    top: 10%;
-    left: 0;
-    right: 0;
-    padding: 10px;
-    background-color: rgba(44, 11, 11, 0.8);
-    height: 100px;
-}
-
-.panel-kart-bot .card {
-    width: 100px; /* Zmniejsz szerokość */
-    height: 100px; /* Zmniejsz wysokość */
-    font-size: 12px; /* Zmniejsz czcionkę */
-}
-
-/* Kontener na ciało bota*/
-.panel-ciala-bot {
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    position: fixed;
-    top: 30%;
-    left: 0;
-    right: 0;
-    padding: 10px;
-    background-color: rgba(44, 11, 11, 0.8);
-    height: 100px;
-
-}
-
-.panel-ciala-bot .card {
-    width: 100px; /* Zmniejsz szerokość */
-    height: 50px; /* Zmniejsz wysokość */
-    font-size: 12px; /* Zmniejsz czcionkę */
-}
-
-/* Kontener na ciało gracza*/
-.panel-ciala-gracz {
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    position: fixed;
-    bottom: 30%;
-    left: 0;
-    right: 0;
-    padding: 10px;
-    background-color: rgba(181, 81, 182, 0.8);
-}
-
-.panel-ciala-gracz .card {
-    width: 100px; /* Zmniejsz szerokość */
-    height: 100px; /* Zmniejsz wysokość */
-    font-size: 12px; /* Zmniejsz czcionkę */
-}
-
-/* Kontener na karty gracza*/
-.panel-kart-gracz {
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 10px;
-    background-color: rgba(181, 81, 182, 0.8);
-}
-
-
-
-
-
-/* Pojedyncza karta */
-.card {
-    width: 150px;
-    height: 200px;
-    margin: 0 10px;
-    padding: 10px;
-    border: 2px solid black;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    font-weight: bold;
-    color: white;
-    font-size: 15px;
-
-    /* Dodanie czarnej ramki wokół liter */
-    text-shadow: 
-        -1px -1px 0 #000,  /* Góra-lewo */
-        1px -1px 0 #000,   /* Góra-prawo */
-        -1px 1px 0 #000,   /* Dół-lewo */
-        1px 1px 0 #000;    /* Dół-prawo */
-}
-
-.card:hover {
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-    transform: scale(1.05);
-    transition: all 0.3s ease;
-}
-
 .gorny-pasek {
     display: flex;
     justify-content: space-between; /* Elementy zostaną rozmieszczone skrajnie */
     align-items: center; /* Wyśrodkowanie w pionie */
     padding: 10px; /* Opcjonalnie, dodanie odstępu wewnętrznego */
-    
 }
 
-.powrot {
+.przycisk {
+    display: inline-block;
     background-color: #DA2580; /* Główny kolor przycisku */
-    color: white; /* Kolor tekstu */
-    border: none; /* Brak ramki */
-    border-radius: 8px; /* Zaokrąglone rogi */
-    padding: 10px 20px; /* Odstępy wewnętrzne */
-    font-size: 16px; /* Rozmiar czcionki */
-    font-weight: bold; /* Pogrubienie tekstu */
-    text-transform: uppercase; /* Wszystkie litery wielkie */
-    cursor: pointer; /* Zmiana kursora na wskaźnik */
+    color: white;               /* Kolor tekstu */
+    border: none;               /* Brak ramki */
+    border-radius: 8px;         /* Zaokrąglone rogi */
+    padding: 10px 20px;         /* Odstępy wewnętrzne */
+    font-size: 16px;            /* Rozmiar czcionki */
+    font-weight: bold;          /* Pogrubienie tekstu */
+    text-transform: uppercase;  /* Wszystkie litery wielkie */
+    cursor: pointer;            /* Kursor wskazujący, że element jest klikalny */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Cień przycisku */
-    transition: all 0.3s ease; /* Płynne przejścia */
+    transition: all 0.3s ease;  /* Płynne przejścia */
+    text-shadow: 
+        -1px -1px 0 #000,     /* Góra-lewo */
+        1px -1px 0 #000,      /* Góra-prawo */
+        -1px 1px 0 #000,      /* Dół-lewo */
+        1px 1px 0 #000;       /* Dół-prawo */
 }
 
-.powrot:hover {
-    background-color: #C0206F; /* Trochę ciemniejszy kolor na hover */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Większy cień */
-    transform: scale(1.05); /* Delikatne powiększenie */
+.przycisk:hover {
+    transform: scale(1.05);                     /* Delikatne powiększenie */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);    /* Większy cień */
+}
+.przycisk:active {
+    transform: scale(0.95);                     /* Delikatne zmniejszenie */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);     /* Mniejszy cień */
+}   
+
+#przycisk-anuluj {
+    background-color: #ff0000; /* Główny kolor przycisku */
+    position: fixed; 
+    top: 48%; 
+    left: 0; 
+    margin: 10px;
+    z-index: 1000;
+    padding: 10px;
 }
 
-.powrot:active {
-    background-color: #A5185D; /* Jeszcze ciemniejszy kolor podczas kliknięcia */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Mniejszy cień */
-    transform: scale(0.95); /* Delikatne zmniejszenie */
+#przycisk-akceptuj {
+    background-color: #22ff00; /* Główny kolor przycisku */
+    position: fixed; 
+    top: 48%; 
+    right: 0; 
+    z-index: 1000;
+    padding: 10px;
 }
 
-.card-placeholder {
+/* Kontener na karty w ręce graczy*/
+.panel-kart {
+    visibility: visible; /* tutaj zmienić potem*/
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    position: fixed;
+    left: 0;
+    right: 0;
+    padding: 10px;
+    height: 120px;
+}
+
+#panel-kart-bot {
+    top: 10%;
+    background-color: rgba(44, 11, 11, 0.8);
+}
+
+#panel-kart-gracz {
+    bottom: 0%;
+    background-color: rgba(181, 81, 182, 0.8);
+}
+
+/* Kontener na ciała graczy*/
+.panel-ciala {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    position: fixed;
+    left: 0;
+    right: 0;
+    padding: 10px;
+    height: 120px;
+}
+
+#panel-ciala-bot {
+    top: 30%;
+    background-color: rgba(44, 11, 11, 0.8);
+
+}
+
+#panel-ciala-gracz {
+    bottom: 30%;
+    background-color: rgba(181, 81, 182, 0.8);
+}
+
+.karta-reka {
+    width: 100px;
+    height: 100px;
+    margin: 0 10px;
+    padding: 10px;
+    border: 2px solid #000000;
+    border-radius: 8px;
+    background: #ddd;
+    color: #ffffff;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-shadow: 
+        -1px -1px 0 #000,     /* Góra-lewo */
+        1px -1px 0 #000,      /* Góra-prawo */
+        -1px 1px 0 #000,      /* Dół-lewo */
+        1px 1px 0 #000;       /* Dół-prawo */
+}
+
+.karta-reka:hover {
+    transform: scale(1.05);                     /* Delikatne powiększenie */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);    /* Większy cień */
+}
+.karta-reka:active {
+    transform: scale(0.95);                     /* Delikatne zmniejszenie */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);     /* Mniejszy cień */
+}  
+
+.karta-cialo {
+    width: 100px;
+    height: 100px;
+    margin: 0 10px;
+    padding: 10px;
+    border: 2px solid #000000;  
+    border-radius: 8px;
+    background: #ddd;
+    color: #ffffff;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+    text-shadow: 
+        -1px -1px 0 #000,     /* Góra-lewo */
+        1px -1px 0 #000,      /* Góra-prawo */
+        -1px 1px 0 #000,      /* Dół-lewo */
+        1px 1px 0 #000;       /* Dół-prawo */  
+}
+
+.karta-cialo:hover {
+    transform: scale(1.05);                     /* Delikatne powiększenie */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);    /* Większy cień */
+}
+.karta-cialo:active {
+    transform: scale(0.95);                     /* Delikatne zmniejszenie */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);     /* Mniejszy cień */
+}  
+
+.karta-placeholder {
     width: 100px;
     height: 100px;
     margin: 0 10px;
@@ -178,47 +195,17 @@ h1 {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+.karta-placeholder:hover {
+    transform: scale(1.05);                     /* Delikatne powiększenie */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);    /* Większy cień */
+}
+.karta-placeholder:active {
+    transform: scale(0.95);                     /* Delikatne zmniejszenie */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);     /* Mniejszy cień */
+}  
+
 .highlight {
-    border: 10px solid #f302af;  /* złote obramowanie */
+    border: 10px solid #b3ff00;  /* złote obramowanie */
     box-shadow: 0 0 20px #f302af;
 }
 
-
-#cancel-button-container {
-    position: fixed; 
-    top: 50%; 
-    left: 0; 
-    transform: 
-    translateY(-50%); 
-    z-index: 1000;
-}
-
-.cancel-button {
-    padding: 10px 20px;
-    background-color: #f44336;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-.cancel-button:hover {
-    background-color: #d32f2f;
-}
-
-#accept-button-container {
-    position: fixed; 
-    top: 50%; 
-    right: 0; 
-    transform: translateY(-50%); 
-    z-index: 1000;
-}
-
-.accept-button {
-    padding: 10px 20px;
-    background-color: #11f30d;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-.accept-button:hover {
-    background-color: #128a09;
-}

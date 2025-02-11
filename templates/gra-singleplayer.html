@@ -2,91 +2,120 @@
 
 {% block body %}
 
-<div id="cancel-button-container">
-    <button onclick="anulujWybor()" class="cancel-button">Anuluj wybór</button>
-</div>
-
-<div id="accept-button-container">
-
-    <form method="POST" action="zagrajKarte" id="zagrajKarteForm">
-        <input type="hidden" id="source_player_id" name="source_player_id" value="{{ player1.id }}">
-        <input type="hidden" id="source_card_id" name="source_card_id" value="{{ source_card_id }}">
-        <input type="hidden" id="target_card_id" name="target_card_id" value="{{ target_card_id }}">
-
-        <button type="submit" class="accept-button">Akceptuj ruch</button>
-    </form>
-</div>
-
-
 <div class="gorny-pasek">
     <h1>gra singleplayer</h1>
-    <p class="powrot">
-        <a href="{{ url_for('index') }}" class="button">powrót do strony głównej</a>
+    <p>
+        <a href="{{ url_for('index') }}" class="przycisk">powrót do strony głównej</a>
     </p>
 </div>
 
-<div class="panel-kart-bot">
+<div class="panel-kart" id="panel-kart-bot">
     {% for card in player2.hand %}
-    <form method="POST" action="/playcard" class="card-form">
-        <button class="card"
-                type="submit"
-                name="card_name"
-                value="{{ card_name }}"
-                style="background: {% if card.color == 'joker' %}linear-gradient(to bottom, red, orange, yellow, green, blue, indigo, violet){% else %}{{ card.color }}{% endif %};">
-            <h3>{{ card.name }}</h3>
-            <p>id: {{ card.id }}</p>
-        </button>
-    </form>
-    {% endfor %}
-</div>
-
-<div class="panel-ciala-bot">
-    {% for card in player2.organsOnTable %}
-    <div class="card"
+    <div class="karta-reka"
          style="background: {% if card.color == 'joker' %}linear-gradient(to bottom, red, orange, yellow, green, blue, indigo, violet){% else %}{{ card.color }}{% endif %};">
         <h3>{{ card.name }}</h3>
-        <p>status: {{ card.status }}</p>
-        <p>id: {{ card.id }}</p>
+        <p>id: {{ card.cardId }}</p>
     </div>
     {% endfor %}
 </div>
 
-<div class="panel-ciala-gracz">
+<div class="panel-ciala" id="panel-ciala-bot">
     {% set sloty = 5 %}
-    {% set liczbaKartWCiele = player1.organsOnTable|length %}
+    {% set liczbaKartWCiele = player2.organsOnTable|length %}
 
-    {# Karty w ciele gracza – kliknięcie ustawia target #}
-    {% for card in player1.organsOnTable %}
-    <div class="card target" id="card_{{ card.id }}"
+    {% for card in player2.organsOnTable %}
+    <div class="karta-cialo"
          style="background: {% if card.color == 'joker' %}linear-gradient(to bottom, red, orange, yellow, green, blue, indigo, violet){% else %}{{ card.color }}{% endif %};"
          onclick="wyborTargetu(this)">
          <h3>{{ card.name }}</h3>
          <p>status: {{ card.status }}</p>
-         <p>id: {{ card.id }}</p>
+         <p>id: {{ card.cardId }}</p>
     </div>
     {% endfor %}
 
     {# Puste miejsca – unikalny id generowany z indeksem #}
     {% for i in range(sloty - liczbaKartWCiele) %}
-    <div class="card-placeholder target" id="card_000_{{ i }}"
+    <div class="karta-placeholder" id="card_000_{{ i }}"
          onclick="wyborTargetu(this)">
          <h3>puste</h3>
     </div>
     {% endfor %}
 </div>
 
-<div class="panel-kart-gracz">
-    {% for card in player1.hand %}
-    <div class="card" id="card_{{ card.id }}"
+<div class="przycisk-container">
+    <button onclick="anulujWybor()" class="przycisk" id="przycisk-anuluj">Anuluj wybór</button>
+</div>
+
+<div class="przycisk-container" >
+    <form method="POST" action="graczZagrajKarte" id="graczZagrajKarteForm">
+        <input type="hidden" id="source_player_id" name="source_player_id" value="{{ player1.id }}">
+        <input type="hidden" id="source_card_id" name="source_card_id" value="{{ source_card_id }}">
+        <input type="hidden" id="target_card_id" name="target_card_id" value="{{ target_card_id }}">
+        <button type="submit" class="przycisk" id="przycisk-akceptuj">Akceptuj ruch</button>
+    </form>
+</div>
+
+<div class="panel-ciala" id="panel-ciala-gracz">
+    {% set sloty = 5 %}
+    {% set liczbaKartWCiele = player1.organsOnTable|length %}
+
+    {% for card in player1.organsOnTable %}
+    <div class="karta-cialo"
          style="background: {% if card.color == 'joker' %}linear-gradient(to bottom, red, orange, yellow, green, blue, indigo, violet){% else %}{{ card.color }}{% endif %};"
-         onclick="wybor('{{ card.id }}')">
+         onclick="wyborTargetu(this)">
+         <h3>{{ card.name }}</h3>
+         <p>status: {{ card.status }}</p>
+         <p>id: {{ card.cardId }}</p>
+    </div>
+    {% endfor %}
+
+    {# Puste miejsca – unikalny id generowany z indeksem #}
+    {% for i in range(sloty - liczbaKartWCiele) %}
+    <div class="karta-placeholder" id="card_000_{{ i }}"
+         onclick="wyborTargetu(this)">
+         <h3>puste</h3>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="panel-kart" id="panel-kart-gracz">
+    {% for card in player1.hand %}
+    <div class="karta-reka"
+         style="background: {% if card.color == 'joker' %}linear-gradient(to bottom, red, orange, yellow, green, blue, indigo, violet){% else %}{{ card.color }}{% endif %};"
+         onclick="wybor('{{ card.cardId }}')">
         <h3>{{ card.name }}</h3>
-        <p>{{ card.id }}</p>
+        <p>{{ card.cardId }}</p>
     </div>
     {% endfor %}
 </div>
 
 <script>
+    function wybor(cardId) {
+        console.log("Wybrano kartę o id: " + cardId);
+    
+        // Usuń podświetlenie ze wszystkich kart gracza
+        var cards = document.querySelectorAll('#panel-kart-gracz .karta-reka');
+        cards.forEach(function(card) {
+            card.classList.remove('highlight');
+        });
+        
+        // Dodaj podświetlenie do wybranej karty
+        // Jeśli identyfikatory kart zmieniły format na "card-{cardId}"
+        var selectedCard = document.getElementById("card-" + cardId);
+        if (selectedCard) {
+            selectedCard.classList.add('highlight');
+        }
+        
+        // Ustaw wartość ukrytego pola formularza source_card_id na cardId
+        var sourceInput = document.getElementById('source_card_id');
+        if (sourceInput) {
+            sourceInput.value = cardId;
+        }
+    }
+</script>
+
+
+<!-- <script>
     function wybor(cardId) {
         console.log("wybrano kartę o id: " + cardId);
     
@@ -174,5 +203,5 @@
             alert("Zagrano karty: \nKarta źródłowa: " + source + "\nTarget: " + target + "\ngracz: " + sourcePlayer);
         }
     });
-</script>
+</script> -->
 {% endblock %}
