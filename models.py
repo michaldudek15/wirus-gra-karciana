@@ -108,7 +108,7 @@ class Player:
         elif isinstance(card, Szczepionka):
             print("ZAGRANIE SZCZEPIONKI\n")
             
-            # Sprawdzenie, czy został przekazany cel (organ)
+            # Sprawdzenie, czy został przekazany cel
             if target is None:
                 print("Nie wybrano celu dla szczepionki!")
                 return -1
@@ -118,20 +118,16 @@ class Player:
                 print("Cel nie jest organem!")
                 return -1
 
-            # Ustalamy, do którego stołu należy cel:
-            # Jeśli targetPlayer nie został podany, przyjmujemy, że gra na własne ciało.
-            # Jeśli targetPlayer został podany, używamy go jako właściciela docelowego.
+            # Ustalamy właściciela stołu – jeśli targetPlayer nie został podany, przyjmujemy własnego gracza
             tableOwner = self if targetPlayer is None else targetPlayer
 
-            # Sprawdzamy, czy wybrany organ faktycznie znajduje się na stole docelowego gracza
+            # Sprawdzamy, czy wybrany organ znajduje się na stole docelowego gracza
             if target not in tableOwner.organsOnTable:
                 print(f"Organ {target.name} nie znajduje się na stole gracza {tableOwner.name}!")
                 return -1
 
-            if card.color != 'joker' and card.color != target.color:
-                print(f"Szczepionkę koloru {card.color} można zagrać tylko na organ o kolorze {card.color}!")
-                return -1
-
+            # (Usunięto sprawdzanie zgodności koloru – teraz można zagrać szczepionkę dowolnego koloru)
+            
             current_status = tableOwner.organsOnTable[target]
 
             # Nie można zagrać szczepionki na uodporniony organ
@@ -140,9 +136,6 @@ class Player:
                 return -1
 
             # Zmieniamy status organu zgodnie z zasadami:
-            # - ze sterylnego na zaszczepiony,
-            # - ze zaszczepionego na uodporniony,
-            # - ze zawirusowanego na sterylny.
             if current_status == "sterylny":
                 new_status = "zaszczepiony"
             elif current_status == "zaszczepiony":
@@ -153,11 +146,11 @@ class Player:
                 print("Nieznany status organu!")
                 return -1
 
-            # Aktualizujemy status organu w słowniku właściciela oraz w samym obiekcie
+            # Aktualizacja statusu organu
             tableOwner.organsOnTable[target] = new_status
             target.status = new_status
 
-            # Usuwamy kartę szczepionki z ręki i dodajemy ją do stosu odrzuconych
+            # Usuwamy kartę szczepionki z ręki, dodajemy do stosu odrzuconych i dobieramy nową kartę
             self.hand.remove(card)
             discardPile.append(card)
             self.drawCard(deck)
@@ -166,9 +159,62 @@ class Player:
             return 0
 
 
-        # TODO
         elif isinstance(card, Wirus):
             print("ZAGRANIE WIRUSA\n")
+            
+            # Sprawdzenie, czy został przekazany cel
+            if target is None:
+                print("Nie wybrano celu dla wirusa!")
+                return -1
+
+            # Upewniamy się, że cel jest organem
+            if not isinstance(target, Organ):
+                print("Cel nie jest organem!")
+                return -1
+
+            # Ustalamy właściciela stołu
+            tableOwner = self if targetPlayer is None else targetPlayer
+
+            # Sprawdzamy, czy wybrany organ znajduje się na stole docelowego gracza
+            if target not in tableOwner.organsOnTable:
+                print(f"Organ {target.name} nie znajduje się na stole gracza {tableOwner.name}!")
+                return -1
+
+            # (Usunięto sprawdzanie zgodności koloru – teraz można zagrać wirusa dowolnego koloru)
+            
+            current_status = tableOwner.organsOnTable[target]
+
+            # Nie można zagrać wirusa na uodporniony organ
+            if current_status == "uodporniony":
+                print("Wirusa nie można zagrać na uodporniony organ!")
+                return -1
+
+            # Efekty zagrania wirusa:
+            if current_status == "zaszczepiony":
+                new_status = "sterylny"
+                tableOwner.organsOnTable[target] = new_status
+                target.status = new_status
+                print(f"Organ {target.name} gracza {tableOwner.name} zmienił status z {current_status} na {new_status} pod wpływem wirusa.")
+            elif current_status == "sterylny":
+                new_status = "zawirusowany"
+                tableOwner.organsOnTable[target] = new_status
+                target.status = new_status
+                print(f"Organ {target.name} gracza {tableOwner.name} zmienił status z {current_status} na {new_status} pod wpływem wirusa.")
+            elif current_status == "zawirusowany":
+                tableOwner.organsOnTable.pop(target)
+                discardPile.append(target)
+                print(f"Organ {target.name} gracza {tableOwner.name} został usunięty ze stołu pod wpływem wirusa.")
+            else:
+                print("Nieznany status organu!")
+                return -1
+
+            # Usuwamy kartę wirusa z ręki, dodajemy ją do stosu odrzuconych i dobieramy nową kartę
+            self.hand.remove(card)
+            discardPile.append(card)
+            self.drawCard(deck)
+
+            print(f"{self.name} zagrał wirusa na organ {target.name} gracza {tableOwner.name}.")
+            return 0
 
         # TODO
         elif isinstance(card, Terapia):
@@ -186,15 +232,34 @@ class GameState:
     def __init__(self):
         self.gameId = str(uuid.uuid4())
         self.players = {}
-        self.currentPlayerId = 0
+        self.currentPlayerIndex = 0
         self.deck = []  
         self.discardPile = []
 
+    def activePlayer(self):
+        # Zamieniamy słownik na listę; założenie: kolejność graczy odpowiada kolejności dodawania
+        players_list = list(self.players.values())
+        if not players_list:
+            return None
+        return players_list[self.currentPlayerIndex]
+
     def nextTurn(self):
-        self.currentPlayerId = (self.currentPlayerId + 1) % len(self.players)
+        self.currentPlayerIndex = (self.currentPlayerIndex + 1) % len(self.players)
 
     def addPlayer(self, player: Player):
         self.players[player.playerId] = player
+
+    def checkForWinner(self):
+        for player in self.players.values():
+            # Liczymy organy o odpowiednim statusie
+            valid_organs = [
+                organ for organ, status in player.organsOnTable.items() 
+                if status in {"sterylny", "zaszczepiony", "uodporniony"}
+            ]
+            if len(valid_organs) >= 4:
+                print(f"Gracz {player.name} wygrał, ponieważ ma {len(valid_organs)} organy spełniające warunki zwycięstwa!")
+                return player
+        return None        
 
     def __repr__(self):
         return (

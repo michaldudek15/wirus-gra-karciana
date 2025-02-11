@@ -9,7 +9,7 @@
     </p>
 </div>
 
-<div class="panel-kart" id="panel-kart-bot" data-playerid="{{ player2.playerId}}">
+<div class="panel-kart {% if player2.playerId != activePlayer.playerId %}ukryta{% endif %}" id="panel-kart-bot" data-playerid="{{ player2.playerId }}">
     {% for card in player2.hand %}
     <div class="karta-reka"
         id="{{ card.cardId }}"
@@ -98,7 +98,7 @@
     {% endfor %}
 </div>
 
-<div class="panel-kart" id="panel-kart-gracz" data-playerid="{{ player1.playerId}}">
+<div class="panel-kart {% if player1.playerId != activePlayer.playerId %}ukryta{% endif %}" id="panel-kart-gracz" data-playerid="{{ player1.playerId }}">
     {% for card in player1.hand %}
     <div class="karta-reka"
         id="{{ card.cardId }}"

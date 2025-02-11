@@ -54,7 +54,9 @@ def graSingleplayer():
     session['gra'] = gra
     session['player1'] = player1
     session['player2'] = player2
-    return  render_template('gra-singleplayer.html', player1 = player1, player2 = player2)
+    session['activePlayer'] = gra.activePlayer()
+
+    return  render_template('gra-singleplayer.html', player1 = player1, player2 = player2, activePlayer = gra.activePlayer())
 
 @app.route('/zacznijGreMultiplayer')
 def graMultiplayer():
@@ -115,12 +117,33 @@ def zagrajKarte():
         elif sourcePlayer.playCard(source_card, gra.deck, gra.discardPile, target_card, targetPlayer) == -1:
             komunikat = "niedozwolony ruch"
 
+    elif isinstance(source_card, Wirus):
+        if target_card_id == "placeholder":
+            komunikat = "Nie wybrano celu dla wirusa!"
+        elif sourcePlayer.playCard(source_card, gra.deck, gra.discardPile, target_card, targetPlayer) == -1:
+            komunikat = "niedozwolony ruch"
+
+    if komunikat == "":
+        gra.nextTurn()
+        session['activePlayer'] = gra.activePlayer()
+
     print(gra)
     session['gra'] = gra
     player1 = session.get('player1')
     player2 = session.get('player2')
+    activePlayer = session.get('activePlayer')
     
-    return  render_template('gra-singleplayer.html', player1 = player1, player2 = player2, komunikat = komunikat)
+    zwyciezca = gra.checkForWinner()
+
+    if zwyciezca:
+        komunikat = f"{zwyciezca.name} wygrał grę!"
+        # Opcjonalnie: usuwamy stan gry z sesji, aby nie dopuścić do dalszych ruchów
+        session.pop('gra', None)
+        # Przekierowujemy na stronę końcową lub renderujemy szablon z komunikatem
+        return render_template('game-over.html', zwyciezca=zwyciezca, komunikat=komunikat)
+
+
+    return  render_template('gra-singleplayer.html', player1 = player1, player2 = player2, komunikat = komunikat, activePlayer = activePlayer)
 
 @app.route('/wymienKarty', methods=['POST'])
 def wymienKarty():

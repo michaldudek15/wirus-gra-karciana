@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="gorny-pasek">
+    <h1>koniec gry</h1>
+</div>
+<h1>{{ komunikat }}</h1>
+<p class="powrot"><a href="{{ url_for('index') }}" class="przycisk">powrót do strony głównej</a></p>
+
+{% endblock %}
