@@ -58,9 +58,9 @@ def graMultiplayer():
 def graHotseat():
     return render_template('todo.html')
 
-# @app.route('/graczZagrajKarte', methods=['POST'])
-# def zagrajKarte():
-#    pass
+@app.route('/zagrajKarte', methods=['POST'])
+def zagrajKarte():
+    print("zagranie karty")
 
 # @app.route('/botZagrajKarte', methods=['POST'])
 # def zagrajKarte():

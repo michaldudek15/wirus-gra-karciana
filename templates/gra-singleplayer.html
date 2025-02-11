@@ -50,7 +50,7 @@
 </div>
 
 <div class="przycisk-container" >
-    <form method="POST" action="zagrajKarte" id="zagrajKarteForm">
+    <form method="POST" action="{{ url_for('zagrajKarte') }}" id="zagrajKarteForm">
         <input type="hidden" id="source_player_id" name="source_player_id" value="">
         <input type="hidden" id="source_card_id" name="source_card_id" value="">
         <input type="hidden" id="target_player_id" name="target_player_id" value="">
@@ -189,25 +189,6 @@
         }
     }
 
-    document.getElementById('zagrajKarteForm').addEventListener('submit', function(event) {
-        // Zatrzymujemy wysyłkę formularza, aby pokazać alert
-        event.preventDefault();
-        
-        // Pobierz wartości z ukrytych pól
-        var sourcePlayer = document.getElementById('source_player_id').value.trim();
-        var source = document.getElementById('source_card_id').value.trim();
-        var targetPlayer = document.getElementById('target_player_id').value.trim();
-        var target = document.getElementById('target_card_id').value.trim();
-
-
-        // Sprawdź, czy oba pola są wypełnione
-        if (source === "" || target === "") {
-            alert("Błąd: Nie wybrano karty źródłowej lub targetu!");
-        } else {
-            alert("szczegóły ruchu: \ngracz źródłowy: " + sourcePlayer + "\nKarta źródłowa: " + source + "\nkarta targetowana: " + target + "\ngracz targetowany: " + targetPlayer);
-        }
-    });
-
     function anulujWybor() {
         // Usuń podświetlenia ze wszystkich elementów
         var highlightedElements = document.querySelectorAll('.highlight');
@@ -233,10 +214,26 @@
 
 <!-- <script>
     
-</script>
+    sprawdzenie wartości w formularzu
+
+ document.getElementById('zagrajKarteForm').addEventListener('submit', function(event) {
+        // Zatrzymujemy wysyłkę formularza, aby pokazać alert
+        event.preventDefault();
+        
+        // Pobierz wartości z ukrytych pól
+        var sourcePlayer = document.getElementById('source_player_id').value.trim();
+        var source = document.getElementById('source_card_id').value.trim();
+        var targetPlayer = document.getElementById('target_player_id').value.trim();
+        var target = document.getElementById('target_card_id').value.trim();
 
 
-<script>
+        // Sprawdź, czy oba pola są wypełnione
+        if (source === "" || target === "") {
+            alert("Błąd: Nie wybrano karty źródłowej lub targetu!");
+        } else {
+            alert("szczegóły ruchu: \ngracz źródłowy: " + sourcePlayer + "\nKarta źródłowa: " + source + "\nkarta targetowana: " + target + "\ngracz targetowany: " + targetPlayer);
+        }
+    });
     
 </script> -->
 {% endblock %}
