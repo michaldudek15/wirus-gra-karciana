@@ -16,7 +16,7 @@
          style="background: {% if card.color == 'joker' %}linear-gradient(to bottom, red, orange, yellow, green, blue, indigo, violet){% else %}{{ card.color }}{% endif %};"
          onclick="wybor(this)">
          <h3>{{ card.name }}</h3>
-        <p>id: {{ card.cardId }}</p>
+        <!-- <p>id: {{ card.cardId }}</p> -->
     </div>
     {% endfor %}
 </div>
@@ -32,7 +32,7 @@
          onclick="wyborTargetu(this)">
          <h3>{{ card.name }}</h3>
          <p>status: {{ card.status }}</p>
-         <p>id: {{ card.cardId }}</p>
+         <!-- <p>id: {{ card.cardId }}</p> -->
     </div>
     {% endfor %}
 
@@ -59,6 +59,21 @@
     </form>
 </div>
 
+<div class="przycisk-container" id="przyciski-wymiana">
+    <form method="POST" action="{{ url_for('wymienKarty') }}">
+      <!-- Przekazujemy id gracza (źródłowego) ukrytym polem -->
+      <input type="hidden" name="source_player_id" value="">
+      
+      <!-- Pola do wpisania identyfikatorów kart, które gracz chce wymienić.
+           Jeśli gracz wymienia mniej niż 3 karty, pozostaw puste pola -->
+      <input type="hidden" name="first_card_id" value="">
+      <input type="hidden" name="second_card_id" value="">
+      <input type="hidden" name="third_card_id" value="">
+      <button class="przycisk" id="przycisk-wymiana">wymień karty</button>
+      <button type="submit" class="przycisk" id="przycisk-akceptuj-wymiana">akceptuj wymianę</button>
+    </form>
+  </div>
+
 <div class="panel-ciala" id="panel-ciala-gracz" data-playerid="{{ player1.playerId}}">
     {% set sloty = 5 %}
     {% set liczbaKartWCiele = player1.organsOnTable|length %}
@@ -70,7 +85,7 @@
          onclick="wyborTargetu(this)">
          <h3>{{ card.name }}</h3>
          <p>status: {{ card.status }}</p>
-         <p>id: {{ card.cardId }}</p>
+         <!-- <p>id: {{ card.cardId }}</p> -->
     </div>
     {% endfor %}
 
@@ -90,7 +105,7 @@
          style="background: {% if card.color == 'joker' %}linear-gradient(to bottom, red, orange, yellow, green, blue, indigo, violet){% else %}{{ card.color }}{% endif %};"
          onclick="wybor(this)">
         <h3>{{ card.name }}</h3>
-        <p>{{ card.cardId }}</p>
+        <!-- <p>{{ card.cardId }}</p> -->
     </div>
     {% endfor %}
 </div>
@@ -209,6 +224,12 @@
 
         console.log("Anulowano wybór, wszystkie podświetlenia i wartości formularza zostały usunięte.");
     }
+
+    var komunikat = "{{ komunikat }}";
+    if(komunikat != "") {
+        alert(komunikat);
+    }
+
 </script>
 
 

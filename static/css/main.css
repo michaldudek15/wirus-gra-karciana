@@ -69,6 +69,22 @@ h1 {
     padding: 10px;
 }
 
+#przyciski-wymiana {
+    position: fixed; 
+    bottom: 20%;
+    right: 5%;
+}
+
+#przycisk-wymiana {
+    background-color: #fffb00; /* Główny kolor przycisku */
+
+}
+
+#przycisk-akceptuj-wymiana {
+    background-color: #fffb00; /* Główny kolor przycisku */
+
+}
+
 /* Kontener na karty w ręce graczy*/
 .panel-kart {
     visibility: visible; /* tutaj zmienić potem*/

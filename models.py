@@ -70,24 +70,39 @@ class Player:
         self.hand.append(card)
         return card
     
-    def discardCardFromHand(self, card: Card, deck: list, discardPile: list):
-        "Odrzuć kartę na stos kart odrzuconych."
-        discardPile.append(card)
-        self.hand.remove(card)
-        self.drawCard(deck)
+    def discardCardsFromHand(self, deck: list, discardPile: list, *cards):
+        "Odrzuć karty na stos kart odrzuconych."
+        for card in cards:
+            discardPile.append(card)
+            self.hand.remove(card)
+            self.drawCard(deck)
 
     def playCard(self, card: Card, deck: list, discardPile: list, target=None):
         "Zagraj kartę z ręki."
         if card not in self.hand:
             raise ValueError(f"Karta {card.name} nie znajduje się w ręce gracza!")
 
-        self.hand.remove(card)
+        result = 0
 
         if isinstance(card, Organ):
-            if card.name in self.organsOnTable:
-                raise ValueError(f"Organ {card.name} już znajduje się na stole gracza {self.name}!")
-            self.organsOnTable[card.name] = "sterylny"
-            print(f"{self.name} zagrał organ {card.name}.")
+            # Iterujemy po istniejących kluczach w organsOnTable
+            for existing_key in self.organsOnTable.keys():
+                # Jeśli klucz to obiekt posiadający atrybut 'name'
+                if hasattr(existing_key, "name"):
+                    if existing_key.name == card.name:
+                        print("1.Organ {card.name} już znajduje się na stole gracza {self.name}!")
+                        result = -1
+                else:
+                    # Jeśli klucz jest stringiem, porównujemy bezpośrednio
+                    if existing_key == card.name:
+                        print("2.Organ {card.name} już znajduje się na stole gracza {self.name}!")
+                        result = -1
+            # Jeśli nie znaleziono duplikatu, dodajemy obiekt jako klucz
+            if (result == 0):
+                self.hand.remove(card)
+                self.organsOnTable[card] = "sterylny"
+                print(f"{self.name} zagrał organ {card.name}.")
+                self.drawCard(deck)
         
         # TODO
         elif isinstance(card, Szczepionka):
@@ -101,7 +116,7 @@ class Player:
         elif isinstance(card, Terapia):
             print("ZAGRANIE TERAPII\n")
 
-        self.drawCard(deck)
+        return result
 
     def __repr__(self):
         return (f"Player(playerId={self.playerId}, name={self.name}, "
@@ -112,7 +127,7 @@ class GameState:
     "Klasa reprezentująca aktualny stan gry."
     def __init__(self):
         self.gameId = str(uuid.uuid4())
-        self.players = []
+        self.players = {}
         self.currentPlayerId = 0
         self.deck = []  
         self.discardPile = []
@@ -121,14 +136,14 @@ class GameState:
         self.currentPlayerId = (self.currentPlayerId + 1) % len(self.players)
 
     def addPlayer(self, player: Player):
-        self.players.append(player)
+        self.players[player.playerId] = player
 
     def __repr__(self):
         return (
             f"GameState(\n"
-            f"  Aktualny gracz: {self.players[self.currentPlayerId].name if self.players else 'None'},\n"
-            f"  Gracze: {[player.name for player in self.players]},\n"
-            f"  Organy: {[player.organsOnTable for player in self.players]} \n"
+            # f"  Aktualny gracz: {self.players.get[self.currentPlayerId].name if self.players else 'None'},\n"
+            f"  Gracze: {[player.name for player in self.players.values()]},\n"
+            f"  Organy: {[player.organsOnTable for player in self.players.values()]} \n"
             f"  Rozmiar talii: {len(self.deck)},\n"
             f"  Rozmiar stosu kart odrzuconych: {len(self.discardPile)},\n"
             f")"
