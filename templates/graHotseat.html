@@ -51,7 +51,7 @@
 
 <div class="przycisk-container" >
     <form method="POST" action="{{ url_for('zagrajKarte') }}" id="zagrajKarteForm">
-        <input type="hidden" id="source_player_id" name="source_player_id" value="">
+        <input type="hidden" id="source_player_id_move" name="source_player_id_move" value="">
         <input type="hidden" id="source_card_id" name="source_card_id" value="">
         <input type="hidden" id="target_player_id" name="target_player_id" value="">
         <input type="hidden" id="target_card_id" name="target_card_id" value="">
@@ -60,17 +60,14 @@
 </div>
 
 <div class="przycisk-container" id="przyciski-wymiana">
-    <form method="POST" action="{{ url_for('wymienKarty') }}">
-      <!-- Przekazujemy id gracza (źródłowego) ukrytym polem -->
-      <input type="hidden" name="source_player_id" value="">
+    <form method="POST" action="{{ url_for('wymienKarty') }}" id="exchangeForm">
       
-      <!-- Pola do wpisania identyfikatorów kart, które gracz chce wymienić.
-           Jeśli gracz wymienia mniej niż 3 karty, pozostaw puste pola -->
-      <input type="hidden" name="first_card_id" value="">
-      <input type="hidden" name="second_card_id" value="">
-      <input type="hidden" name="third_card_id" value="">
-      <button class="przycisk" id="przycisk-wymiana">wymień karty</button>
-      <button type="submit" class="przycisk" id="przycisk-akceptuj-wymiana">akceptuj wymianę</button>
+        <input type="hidden" name="source_player_id_exchange" id="source_player_id_exchange" value="">
+      <input type="hidden" name="first_card_id" id="first_card_id" value="">
+      <input type="hidden" name="second_card_id" id="second_card_id" value="">
+      <input type="hidden" name="third_card_id" id="third_card_id" value="">
+      <button type="button" class="przycisk" id="przycisk-wymiana" onclick="enableExchangeMode()">wymień karty</button>
+        <button type="submit" class="przycisk" id="przycisk-akceptuj-wymiana">akceptuj wymianę</button>
     </form>
   </div>
 
@@ -124,7 +121,7 @@
             if (sourceCardInput) {
                 sourceCardInput.value = "";
             }
-            var sourcePlayerInput = document.getElementById('source_player_id');
+            var sourcePlayerInput = document.getElementById('source_player_id_move');
             if (sourcePlayerInput) {
                 sourcePlayerInput.value = "";
             }
@@ -147,7 +144,7 @@
         if (sourceCardInput) {
             sourceCardInput.value = elem.id;
         }
-        var sourcePlayerInput = document.getElementById('source_player_id');
+        var sourcePlayerInput = document.getElementById('source_player_id_move');
         if (sourcePlayerInput) {
             sourcePlayerInput.value = playerId;
         }
@@ -210,9 +207,9 @@
         highlightedElements.forEach(function(element) {
             element.classList.remove('highlight');
         });
-
-        // Wyczyść wartości w formularzu
-        var sourcePlayerInput = document.getElementById('source_player_id');
+    
+        // Wyczyść wartości w formularzu ruchu (źródłowe i docelowe pola)
+        var sourcePlayerInput = document.getElementById('source_player_id_move');
         var sourceCardInput = document.getElementById('source_card_id');
         var targetPlayerInput = document.getElementById('target_player_id');
         var targetCardInput = document.getElementById('target_card_id');
@@ -221,8 +218,15 @@
         if (sourceCardInput) { sourceCardInput.value = ""; }
         if (targetPlayerInput) { targetPlayerInput.value = ""; }
         if (targetCardInput) { targetCardInput.value = ""; }
-
-        console.log("Anulowano wybór, wszystkie podświetlenia i wartości formularza zostały usunięte.");
+        
+        // Wyczyść także wartość ukrytego pola formularza wymiany kart
+        var exchangeCardsField = document.getElementById('exchangeCardsField');
+        if (exchangeCardsField) { exchangeCardsField.value = ""; }
+        
+        // Wyłącz tryb wymiany (usunięcie klas exchange-mode i exchange-selected oraz przywrócenie standardowych onclick)
+        disableExchangeMode();
+        
+        console.log("Anulowano wybór, formularz wymiany został wyczyszczony, a tryb wymiany wyłączony.");
     }
 
     var komunikat = "{{ komunikat }}";
@@ -235,7 +239,7 @@
         event.preventDefault();
         
         // Pobierz wartości z ukrytych pól
-        var sourcePlayer = document.getElementById('source_player_id').value.trim();
+        var sourcePlayer = document.getElementById('source_player_id_exchange').value.trim();
         var source = document.getElementById('source_card_id').value.trim();
         var targetPlayer = document.getElementById('target_player_id').value.trim();
         var target = document.getElementById('target_card_id').value.trim();
@@ -250,7 +254,138 @@
         }
     });
 
+    
+    let exchangeMode = false;
+    let selectedExchangeCards = [];
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // Załóżmy, że player1.playerId jest dostępne i podajesz go w szablonie jako zmienną JS
+        const sourcePlayerId = "{{ activePlayer.playerId }}";
+        
+        // Ustaw wartość dla ukrytego pola w formularzu ruchu
+        const sourcePlayerInputMove = document.getElementById("source_player_id_move");
+        if (sourcePlayerInputMove) {
+            sourcePlayerInputMove.value = sourcePlayerId;
+        }
+    
+        // Ustaw wartość dla ukrytego pola w formularzu wymiany
+        const sourcePlayerInputExchange = document.getElementById("source_player_id_exchange");
+        if (sourcePlayerInputExchange) {
+            sourcePlayerInputExchange.value = sourcePlayerId;
+        }
+    });
+    
+    function enableExchangeMode() {
+        // Usuń zaznaczenia ze wszystkich kart (nie tylko z #panel-kart-gracz, ale ze wszystkich aktywnych)
+        const normalHighlightedCards = document.querySelectorAll(".panel-kart .highlight");
+        normalHighlightedCards.forEach(card => {
+            card.classList.remove("highlight");
+        });
+    
+        exchangeMode = true;
+        selectedExchangeCards = [];
+    
+        // Wybierz aktywny panel (ten, który nie ma klasy "ukryta")
+        var activePanel = document.querySelector(".panel-kart:not(.ukryta)");
+        if (!activePanel) {
+            console.error("Nie znaleziono aktywnego panelu kart!");
+            return;
+        }
+        
+        // Pobierz wszystkie karty w aktywnym panelu
+        const cards = activePanel.querySelectorAll(".karta-reka");
+        cards.forEach(card => {
+            // Dodajemy efekt trybu wymiany (np. dodatkowy outline)
+            card.classList.add("exchange-mode");
+            // Usuń dotychczasowy atrybut onclick, żeby nie wywoływał np. funkcji wybor()
+            card.removeAttribute("onclick");
+            // Dodaj nowy event listener dla trybu wymiany
+            card.addEventListener("click", function exchangeListener() {
+                cardClicked(card);
+            });
+        });
+        console.log("Tryb wymiany aktywowany. Wybierz do 3 kart do wymiany.");
+    }
+
+    function disableExchangeMode() {
+        exchangeMode = false;
+        selectedExchangeCards = [];
+        var activePanel = document.querySelector(".panel-kart:not(.ukryta)");
+        if (!activePanel) {
+            console.error("Nie znaleziono aktywnego panelu kart!");
+            return;
+        }
+        const cards = activePanel.querySelectorAll(".karta-reka");
+        cards.forEach(card => {
+            card.classList.remove("exchange-mode");
+            card.classList.remove("highlight");
+            // Przywracamy domyślne działanie – np. funkcję wybor()
+            card.removeEventListener("click", cardClicked);
+            card.setAttribute("onclick", "wybor(this)");
+        });
+        console.log("Tryb wymiany wyłączony.");
+    }
+
+function cardClicked(cardElement) {
+    if (!exchangeMode) return; // jeśli tryb wymiany nie jest aktywny, ignoruj kliknięcie
+
+    // Jeśli karta jest już podświetlona (czyli zaznaczona), odznacz ją
+    if (cardElement.classList.contains("highlight")) {
+        cardElement.classList.remove("highlight");
+        selectedExchangeCards = selectedExchangeCards.filter(id => id !== cardElement.id);
+    } else {
+        // Jeśli nie jest zaznaczona, dodaj ją – ale tylko, gdy nie przekroczysz limitu 3 kart
+        if (selectedExchangeCards.length < 3) {
+            cardElement.classList.add("highlight");
+            selectedExchangeCards.push(cardElement.id);
+        } else {
+            alert("Możesz wybrać maksymalnie 3 karty do wymiany.");
+        }
+    }
+    console.log("Wybrane karty do wymiany:", selectedExchangeCards);
+}
+
+
+document.getElementById("przycisk-akceptuj-wymiana").addEventListener("click", function() {
+    if (!exchangeMode) {
+        alert("Najpierw włącz tryb wymiany!");
+        return;
+    }
+    if (selectedExchangeCards.length === 0) {
+        alert("Nie wybrano żadnej karty do wymiany!");
+        return;
+    }
+    
+    // Przypisz karty do poszczególnych pól
+    document.getElementById("first_card_id").value = selectedExchangeCards[0] || "";
+    document.getElementById("second_card_id").value = selectedExchangeCards[1] || "";
+    document.getElementById("third_card_id").value = selectedExchangeCards[2] || "";
+    
+    // Wysyłamy formularz wymiany
+    document.getElementById("exchangeForm").submit();
+    disableExchangeMode();
+});
+
+document.getElementById('exchangeForm').addEventListener('submit', function(event) {
+    // Zatrzymujemy wysyłkę formularza, aby pokazać alert
+    event.preventDefault();
+    
+    // Pobierz wartości z ukrytych pól
+    var sourcePlayer = document.getElementById('source_player_id_exchange').value.trim();
+    var pierwsza = document.getElementById('first_card_id').value.trim();
+    var druga = document.getElementById('second_card_id').value.trim();
+    var trzecia = document.getElementById('third_card_id').value.trim();
+
+    // alert("szczegóły wymiany: \ngracz źródłowy: " + sourcePlayer + "\nKarta pierwsza: " + pierwsza + "\nkarta druga: " + druga + "\nkarta trzecia: " + trzecia);
+    event.target.submit();
+    
+});
+
+
+
 </script>
+
+
 
 
 <!-- <script>

@@ -1,4 +1,4 @@
-import uuid
+import uuid, random
 
 class Card:
     "Bazowa klasa reprezentująca kartę."
@@ -62,20 +62,49 @@ class Player:
             print(indeks, "–", karta)
             indeks += 1
 
-    def drawCard(self, deck: list):
-        "Dobierz kartę z talii do ręki gracza."
+    def drawCard(self, deck: list, discardPile: list):
+        """
+        Dobiera kartę z talii do ręki gracza.
+        Jeśli talia jest pusta, uzupełnia ją z odrzuconych i przetasowuje.
+        """
         if not deck:
-            raise ValueError("Talia jest pusta!")
+            if not discardPile:
+                raise ValueError("Talia jest pusta, brak kart do doboru!")
+            # Uzupełniamy talię ze stosu odrzuconych
+            deck.extend(discardPile)
+            discardPile.clear()
+            random.shuffle(deck)
+            print("Talia została uzupełniona ze stosu odrzuconych i przetasowana.")
         card = deck.pop()
         self.hand.append(card)
         return card
     
-    def discardCardsFromHand(self, deck: list, discardPile: list, *cards):
-        "Odrzuć karty na stos kart odrzuconych."
-        for card in cards:
+    # def discardCardsFromHand(self, deck: list, discardPile: list, *cards):
+    #     "Odrzuć karty na stos kart odrzuconych."
+    #     for card in cards:
+    #         discardPile.append(card)
+    #         self.hand.remove(card)
+    #         self.drawCard(deck)
+
+    def exchangeCards(self, deck: list, discardPile: list, card_ids: list):
+        """
+        Wymienia karty z ręki na podstawie podanej listy identyfikatorów.
+        Dla każdej karty:
+         - usuwa kartę z ręki,
+         - dodaje ją do stosu kart odrzuconych,
+         - dobiera nową kartę z talii.
+        """
+        cards_to_exchange = []
+        for card_id in card_ids:
+            for card in self.hand:
+                if card.cardId == card_id:
+                    cards_to_exchange.append(card)
+                    break
+
+        for card in cards_to_exchange:
             discardPile.append(card)
             self.hand.remove(card)
-            self.drawCard(deck)
+            self.drawCard(deck, discardPile)
 
     def playCard(self, card: Card, deck: list, discardPile: list, target=None, targetPlayer=None):
         "Zagraj kartę z ręki."
@@ -102,7 +131,7 @@ class Player:
                 self.hand.remove(card)
                 self.organsOnTable[card] = "sterylny"
                 print(f"{self.name} zagrał organ {card.name}.")
-                self.drawCard(deck)
+                self.drawCard(deck, discardPile)
         
 
         elif isinstance(card, Szczepionka):
@@ -157,7 +186,7 @@ class Player:
             # Usuwamy kartę szczepionki z ręki, dodajemy ją do stosu odrzuconych i dobieramy nową kartę
             self.hand.remove(card)
             discardPile.append(card)
-            self.drawCard(deck)
+            self.drawCard(deck, discardPile)
 
             print(f"{self.name} zagrał szczepionkę na organ {target.name} gracza {tableOwner.name}. Organ zmienił status z {current_status} na {new_status}.")
             return 0
@@ -219,7 +248,7 @@ class Player:
             # Usuwamy kartę wirusa z ręki, dodajemy ją do stosu odrzuconych i dobieramy nową kartę
             self.hand.remove(card)
             discardPile.append(card)
-            self.drawCard(deck)
+            self.drawCard(deck, discardPile)
 
             print(f"{self.name} zagrał wirusa na organ {target.name} gracza {tableOwner.name}.")
             return 0
@@ -268,6 +297,23 @@ class GameState:
                 print(f"Gracz {player.name} wygrał, ponieważ ma {len(valid_organs)} organy spełniające warunki zwycięstwa!")
                 return player
         return None        
+
+    def refillDeck(self):
+        """
+        Jeśli talia (deck) jest pusta, przetasowuje karty ze stosu odrzuconych (discardPile)
+        i dodaje je do talii, aby można było dalej dobierać karty.
+        """
+        if not self.deck:
+            if not self.discardPile:
+                raise ValueError("Brak kart do przetasowania: zarówno talia, jak i stos odrzuconych są puste!")
+            # Dodaj karty ze stosu odrzuconych do talii
+            self.deck.extend(self.discardPile)
+            # Wyczyść stos odrzuconych
+            self.discardPile.clear()
+            # Przetasuj talię
+            random.shuffle(self.deck)
+            print("Talia została uzupełniona ze stosu odrzuconych i przetasowana.")
+
 
     def __repr__(self):
         return (

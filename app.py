@@ -39,13 +39,13 @@ def graHotseat():
     gra.addPlayer(player1)
     gra.addPlayer(player2)
 
-    player1.drawCard(gra.deck)
-    player1.drawCard(gra.deck)
-    player1.drawCard(gra.deck)
+    player1.drawCard(gra.deck, gra.discardPile)
+    player1.drawCard(gra.deck, gra.discardPile)
+    player1.drawCard(gra.deck, gra.discardPile)
 
-    player2.drawCard(gra.deck)
-    player2.drawCard(gra.deck)
-    player2.drawCard(gra.deck)
+    player2.drawCard(gra.deck, gra.discardPile)
+    player2.drawCard(gra.deck, gra.discardPile)
+    player2.drawCard(gra.deck, gra.discardPile)
 
     player1.organsOnTable[testowaKarta1] = testowaKarta1.status
     player1.organsOnTable[testowaKarta2] = testowaKarta2.status
@@ -69,7 +69,7 @@ def graZBotem():
 @app.route('/zagrajKarte', methods=['POST'])
 def zagrajKarte():
 # Pobranie danych z formularza
-    source_player_id = request.form.get('source_player_id')
+    source_player_id = request.form.get('source_player_id_move')
     source_card_id   = request.form.get('source_card_id')
     target_player_id = request.form.get('target_player_id')
     target_card_id   = request.form.get('target_card_id')
@@ -147,44 +147,45 @@ def zagrajKarte():
 
 @app.route('/wymienKarty', methods=['POST'])
 def wymienKarty():
-    source_player_id = request.form.get('source_player_id')
-    first_card_id   = request.form.get('first_card_id')
-    second_card_id = request.form.get('second_card_id')
-    third_card_id   = request.form.get('third_card_id')
-
+    # Pobieramy stan gry (obiekt gra) z sesji
     gra = session.get('gra')
-    if not gra:
-        flash("Brak stanu gry w sesji!", "error")
-        return redirect(url_for('graHotseat'))
-    
-        # Pobierz gracza, który chce wymienić karty
-    sourcePlayer = gra.players.get(source_player_id)
-    if not sourcePlayer:
-        flash("Nie znaleziono gracza o podanym id!", "error")
-        return redirect(url_for('graHotseat'))
-    
-    # Budujemy listę identyfikatorów kart do wymiany
-    card_ids = [first_card_id, second_card_id, third_card_id]
-    cards_to_exchange = []
-    for cid in card_ids:
-        if cid:  # Jeśli pole nie jest puste
-            # Wyszukujemy kartę w ręce gracza o podanym cardId
-            card = next((c for c in sourcePlayer.hand if c.cardId == cid), None)
-            if not card:
-                flash(f"Karta o id {cid} nie znajduje się w ręce gracza!", "error")
-                return redirect(url_for('graHotseat'))
-            cards_to_exchange.append(card)
-    
-    # Wykonaj wymianę kart (odrzuć wybrane karty, dobierz nowe)
-    sourcePlayer.discardCardsFromHand(gra.deck, gra.discardPile, *cards_to_exchange)
-    
-    # Zaktualizuj stan gry w sesji
-    print(gra)
-    session['gra'] = gra
-    player1 = session.get('player1')
-    player2 = session.get('player2')    
-    return  render_template('graHotseat.html', player1 = player1, player2 = player2)
+    if gra is None:
+        return "Brak stanu gry w sesji", 400
 
+    # Ustal aktywnego gracza (przyjmujemy, że metoda activePlayer() zwraca aktywnego gracza)
+    active_player = gra.activePlayer()
+    if active_player is None:
+        return "Nie znaleziono aktywnego gracza", 400
+
+    # Pobieramy z formularza identyfikatory kart do wymiany
+    first_card_id = request.form.get('first_card_id', '').strip()
+    second_card_id = request.form.get('second_card_id', '').strip()
+    third_card_id = request.form.get('third_card_id', '').strip()
+
+    # Tworzymy listę identyfikatorów, pomijając puste wartości
+    card_ids = [card_id for card_id in [first_card_id, second_card_id, third_card_id] if card_id]
+
+    if not card_ids:
+        return "Nie wybrano kart do wymiany", 400
+
+    try:
+        # Próba wymiany kart
+        active_player.exchangeCards(gra.deck, gra.discardPile, card_ids)
+        komunikat = "Karty zostały wymienione."
+        # Przejście do następnej tury
+        gra.nextTurn()
+        session['activePlayer'] = gra.activePlayer()
+    except Exception as e:
+        komunikat = str(e)
+
+    # Zapisujemy zaktualizowany stan gry do sesji
+    session['gra'] = gra
+
+    return render_template('graHotseat.html', 
+                           player1=session.get('player1'),
+                           player2=session.get('player2'),
+                           activePlayer=session.get('activePlayer'),
+                           komunikat=komunikat)
 # @app.route('/botZagrajKarte', methods=['POST'])
 # def zagrajKarte():
 #    pass

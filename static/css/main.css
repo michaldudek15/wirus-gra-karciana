@@ -228,3 +228,14 @@ h1 {
 .ukryta {
     display: none;
   }
+
+/* Styl podświetlenia kart w trybie wymiany */
+.karta-reka.exchange-mode {
+    outline: 2px solid orange;
+    cursor: pointer;
+}
+
+/* Styl dla zaznaczonych kart */
+.karta-reka.exchange-selected {
+    border: 3px solid red;
+}
