@@ -3,29 +3,28 @@
 {% block body %}
 
 <div class="gorny-pasek">
-    <h1>gra hotseat</h1>
+    <h1>gra z botem</h1>
     <p>
         <a href="{{ url_for('index') }}" class="przycisk">powrót do strony głównej</a>
     </p>
 </div>
 
-<div class="panel-kart {% if player2.playerId != activePlayer.playerId %}ukryta{% endif %}" id="panel-kart-bot" data-playerid="{{ player2.playerId }}">
-    {% for card in player2.hand %}
+<div class="panel-kart" id="panel-kart-bot" data-playerid="{{ bot.playerId }}">
+    {% for card in bot.hand %}
     <div class="karta-reka"
         id="{{ card.cardId }}"
-         style="background: {% if card.color == 'joker' %}linear-gradient(to bottom, red, orange, yellow, green, blue, indigo, violet){% else %}{{ card.color }}{% endif %};"
-         onclick="wybor(this)">
+         style="background: {% if card.color == 'joker' %}linear-gradient(to bottom, red, orange, yellow, green, blue, indigo, violet){% else %}{{ card.color }}{% endif %};">
          <h3>{{ card.name }}</h3>
         <!-- <p>id: {{ card.cardId }}</p> -->
     </div>
     {% endfor %}
 </div>
 
-<div class="panel-ciala" id="panel-ciala-bot" data-playerid="{{ player2.playerId}}">
+<div class="panel-ciala" id="panel-ciala-bot" data-playerid="{{ bot.playerId}}">
     {% set sloty = 5 %}
-    {% set liczbaKartWCiele = player2.organsOnTable|length %}
+    {% set liczbaKartWCiele = bot.organsOnTable|length %}
 
-    {% for card in player2.organsOnTable %}
+    {% for card in bot.organsOnTable %}
     <div class="karta-cialo"
         id="{{ card.cardId }}"
          style="background: {% if card.color == 'joker' %}linear-gradient(to bottom, red, orange, yellow, green, blue, indigo, violet){% else %}{{ card.color }}{% endif %};"
@@ -95,8 +94,8 @@
     {% endfor %}
 </div>
 
-<div class="panel-kart {% if player1.playerId != activePlayer.playerId %}ukryta{% endif %}" id="panel-kart-gracz" data-playerid="{{ player1.playerId }}">
-    {% for card in player1.hand %}
+<div class="panel-kart" id="panel-kart-gracz" data-playerid="{{ player1.playerId }}">
+        {% for card in player1.hand %}
     <div class="karta-reka"
         id="{{ card.cardId }}"
          style="background: {% if card.color == 'joker' %}linear-gradient(to bottom, red, orange, yellow, green, blue, indigo, violet){% else %}{{ card.color }}{% endif %};"
@@ -259,16 +258,14 @@
     let selectedExchangeCards = [];
 
     document.addEventListener("DOMContentLoaded", function() {
-        // Załóżmy, że player1.playerId jest dostępne i podajesz go w szablonie jako zmienną JS
-        const sourcePlayerId = "{{ activePlayer.playerId }}";
+        // Zawsze używamy player1 jako gracza wykonującego wymianę
+        const sourcePlayerId = "{{ player1.playerId }}";
         
-        // Ustaw wartość dla ukrytego pola w formularzu ruchu
         const sourcePlayerInputMove = document.getElementById("source_player_id_move");
         if (sourcePlayerInputMove) {
             sourcePlayerInputMove.value = sourcePlayerId;
         }
     
-        // Ustaw wartość dla ukrytego pola w formularzu wymiany
         const sourcePlayerInputExchange = document.getElementById("source_player_id_exchange");
         if (sourcePlayerInputExchange) {
             sourcePlayerInputExchange.value = sourcePlayerId;
@@ -276,39 +273,51 @@
     });
     
     function enableExchangeMode() {
+        // Usuń podświetlenia z kart w panelu ręki
+        const normalHighlightedCards = document.querySelectorAll(".panel-kart .highlight");
+        normalHighlightedCards.forEach(card => {
+            card.classList.remove("highlight");
+        });
+    
+        // Dodatkowo usuń podświetlenia z kart w panelu ciała
+        var bodyPanel = document.getElementById("panel-ciala-gracz");
+        if (bodyPanel) {
+            const highlightedBodyCards = bodyPanel.querySelectorAll(".highlight");
+            highlightedBodyCards.forEach(card => {
+                card.classList.remove("highlight");
+            });
+        }
+    
         exchangeMode = true;
         selectedExchangeCards = [];
     
-        // Znajdujemy aktywnego gracza w trybie hotseat
-        var activePanel = document.querySelector(".panel-kart:not(.ukryta)");
+        // Wybierz aktywny panel kart (tu: panel gracza, a nie bota)
+        var activePanel = document.querySelector("#panel-kart-gracz");
         if (!activePanel) {
             console.error("Nie znaleziono aktywnego panelu kart!");
             return;
         }
-    
-        console.log("Tryb wymiany aktywowany. Wybierz do 3 kart do wymiany.");
-    
-        // Pobierz wszystkie karty w ręce aktywnego gracza
+        
+        // Pobierz wszystkie karty w aktywnym panelu i przełącz je do trybu wymiany
         const cards = activePanel.querySelectorAll(".karta-reka");
-        if (cards.length === 0) {
-            alert("Nie masz kart do wymiany!");
-            return;
-        }
-    
         cards.forEach(card => {
-            card.classList.add("exchange-mode");  // Dodajemy efekt trybu wymiany
-            card.removeAttribute("onclick");  // Usuwamy stare onclick, żeby uniknąć konfliktów
-            card.addEventListener("click", function() {
+            // Dodajemy efekt trybu wymiany (np. dodatkowy outline)
+            card.classList.add("exchange-mode");
+            // Usuń dotychczasowy atrybut onclick, żeby nie wywoływał np. funkcji wybor()
+            card.removeAttribute("onclick");
+            // Dodaj nowy event listener dla trybu wymiany
+            card.addEventListener("click", function exchangeListener() {
                 cardClicked(card);
             });
         });
+        console.log("Tryb wymiany aktywowany. Wybierz do 3 kart do wymiany.");
     }
 
     function disableExchangeMode() {
         exchangeMode = false;
         selectedExchangeCards = [];
-        var activePanel = document.querySelector(".panel-kart:not(.ukryta)");
-        if (!activePanel) {
+        var activePanel = document.getElementById("panel-kart-gracz");
+            if (!activePanel) {
             console.error("Nie znaleziono aktywnego panelu kart!");
             return;
         }

@@ -3,7 +3,7 @@ from flask import Flask, render_template, url_for, request, redirect, flash, ses
 from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
 from deck import buildDeck
-from models import Card, Organ, Wirus, Szczepionka, Terapia, Player, GameState
+from models import Card, Organ, Wirus, Szczepionka, Terapia, Player, BotPlayer, GameState
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'slodkiekotki'
@@ -55,15 +55,49 @@ def graHotseat():
     session['player1'] = player1
     session['player2'] = player2
     session['activePlayer'] = gra.activePlayer()
+    session['gameMode'] = 'hotseat'  # ustawienie trybu hotseat
+
 
     return  render_template('graHotseat.html', player1 = player1, player2 = player2, activePlayer = gra.activePlayer())
 
-@app.route('/zacznijGreMultiplayer')
-def graMultiplayer():
-    return render_template('todo.html')
-
 @app.route('/zacznijGreZBotem')
 def graZBotem():
+    gra = GameState()
+    gra.deck = buildDeck()
+
+    player1 = Player("player1")
+    bot = BotPlayer("bot")
+
+    # testowaKarta1 = Organ("serce", "red", "opis")
+    # testowaKarta2 = Organ("mózg", "blue", "opis")
+    # testowaKarta3 = Organ("kość", "yellow", "opis")
+
+    gra.addPlayer(player1)
+    gra.addPlayer(bot)
+
+    player1.drawCard(gra.deck, gra.discardPile)
+    player1.drawCard(gra.deck, gra.discardPile)
+    player1.drawCard(gra.deck, gra.discardPile)
+
+    bot.drawCard(gra.deck, gra.discardPile)
+    bot.drawCard(gra.deck, gra.discardPile)
+    bot.drawCard(gra.deck, gra.discardPile)
+
+    # player1.organsOnTable[testowaKarta1] = testowaKarta1.status
+    # player1.organsOnTable[testowaKarta2] = testowaKarta2.status
+    # player2.organsOnTable[testowaKarta3] = testowaKarta3.status
+
+    session['gra'] = gra
+    session['player1'] = player1
+    session['player2'] = bot
+    session['activePlayer'] = gra.activePlayer()
+    session['gameMode'] = 'singleplayer'
+
+
+    return render_template('graSingleplayer.html', player1 = player1, bot = bot, activePlayer = gra.activePlayer())
+
+@app.route('/zacznijGreMultiplayer')
+def graMultiplayer():
     return render_template('todo.html')
 
 @app.route('/zagrajKarte', methods=['POST'])
@@ -142,8 +176,11 @@ def zagrajKarte():
         # Przekierowujemy na stronę końcową lub renderujemy szablon z komunikatem
         return render_template('game-over.html', zwyciezca=zwyciezca, komunikat=komunikat)
 
+    if session.get('gameMode') == 'hotseat':
+        return  render_template('graHotseat.html', player1 = player1, player2 = player2, komunikat = komunikat, activePlayer = activePlayer)
+    elif session.get('gameMode') == 'singleplayer':
+        return  render_template('graSingleplayer.html', player1 = player1, bot = player2, komunikat = komunikat, activePlayer = activePlayer)
 
-    return  render_template('graHotseat.html', player1 = player1, player2 = player2, komunikat = komunikat, activePlayer = activePlayer)
 
 @app.route('/wymienKarty', methods=['POST'])
 def wymienKarty():
@@ -166,12 +203,12 @@ def wymienKarty():
     card_ids = [card_id for card_id in [first_card_id, second_card_id, third_card_id] if card_id]
 
     if not card_ids:
-        return "Nie wybrano kart do wymiany", 400
+        print("Nie wybrano kart do wymiany")
 
     try:
         # Próba wymiany kart
         active_player.exchangeCards(gra.deck, gra.discardPile, card_ids)
-        komunikat = "Karty zostały wymienione."
+        print("Karty zostały wymienione.")
         # Przejście do następnej tury
         gra.nextTurn()
         session['activePlayer'] = gra.activePlayer()
@@ -181,11 +218,17 @@ def wymienKarty():
     # Zapisujemy zaktualizowany stan gry do sesji
     session['gra'] = gra
 
-    return render_template('graHotseat.html', 
-                           player1=session.get('player1'),
-                           player2=session.get('player2'),
-                           activePlayer=session.get('activePlayer'),
-                           komunikat=komunikat)
+    if session.get('gameMode') == 'hotseat':
+        return render_template('graHotseat.html', 
+                               player1=session.get('player1'),
+                               player2=session.get('player2'),
+                               activePlayer=session.get('activePlayer'))
+    elif session.get('gameMode') == 'singleplayer':
+        return render_template('graSingleplayer.html', 
+                               player1=session.get('player1'),
+                                bot=session.get('player2'),
+                               activePlayer=session.get('activePlayer'))
+
 # @app.route('/botZagrajKarte', methods=['POST'])
 # def zagrajKarte():
 #    pass

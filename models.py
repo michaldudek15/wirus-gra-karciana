@@ -263,7 +263,6 @@ class Player:
         return (f"Player(playerId={self.playerId}, name={self.name}, "
                 f"hand={[card.name for card in self.hand]})")
 
-
 class GameState:
     "Klasa reprezentująca aktualny stan gry."
     def __init__(self):
@@ -281,22 +280,35 @@ class GameState:
         return players_list[self.currentPlayerIndex]
 
     def nextTurn(self):
+        winner = self.checkForWinner()
+        if winner:
+            print(f"🎉 Gra zakończona! Zwycięzca: {winner.name} 🎉")
+            return  # Kończy grę, gdy jest zwycięzca
+        
         self.currentPlayerIndex = (self.currentPlayerIndex + 1) % len(self.players)
+        
+        current_player = self.activePlayer()
+        print(f"🕹️ Ruch gracza: {current_player.name}")
+
+        if isinstance(current_player, BotPlayer):
+            current_player.makeMove(self)
+            # Automatycznie przechodzimy do kolejnej tury po ruchu bota
+            self.nextTurn()
 
     def addPlayer(self, player: Player):
         self.players[player.playerId] = player
 
     def checkForWinner(self):
         for player in self.players.values():
-            # Liczymy organy o odpowiednim statusie
             valid_organs = [
                 organ for organ, status in player.organsOnTable.items() 
                 if status in {"sterylny", "zaszczepiony", "uodporniony"}
             ]
             if len(valid_organs) >= 4:
-                print(f"Gracz {player.name} wygrał, ponieważ ma {len(valid_organs)} organy spełniające warunki zwycięstwa!")
+                print(f"🎉 Gracz {player.name} wygrał, ponieważ ma {len(valid_organs)} organów spełniających warunki zwycięstwa! 🎉")
+                self.winner = player  # Nowy atrybut przechowujący zwycięzcę
                 return player
-        return None        
+        return None      
 
     def refillDeck(self):
         """
@@ -325,3 +337,80 @@ class GameState:
             f"  Rozmiar stosu kart odrzuconych: {len(self.discardPile)},\n"
             f")"
         )
+
+class BotPlayer(Player):
+    def __init__(self, name="Bot"):
+        super().__init__(name)
+
+    def makeMove(self, gameState: GameState):
+        if not self.hand:
+            print("Bot nie ma kart w ręce! Dobiera nową kartę.")
+            self.drawCard(gameState.deck, gameState.discardPile)
+            return
+        
+        # Sprawdzenie czy bot wygrał przed ruchem
+        if gameState.checkForWinner():
+            return
+
+        # 1. Próbujemy zagrać kartę Organ
+        for card in self.hand:
+            if isinstance(card, Organ):
+                if all(existing_card.name != card.name for existing_card in self.organsOnTable.keys()):
+                    print(f"🤖 Bot zagrywa Organ: {card.name}")
+                    result = self.playCard(card, gameState.deck, gameState.discardPile)
+                    if result == 0:
+                        if gameState.checkForWinner():
+                            return  # Jeśli bot wygrał, kończymy natychmiast
+                        return
+
+        # 2. Próbujemy zagrać kartę Wirus
+        opponent = next(p for p in gameState.players.values() if p != self)
+        if opponent.organsOnTable:
+            for card in self.hand:
+                if isinstance(card, Wirus):
+                    allowed_targets = [
+                        organ for organ in opponent.organsOnTable.keys()
+                        if (card.color == 'joker' or organ.color == 'joker' or organ.color == card.color)
+                    ]
+                    if allowed_targets:
+                        target = random.choice(allowed_targets)
+                        print(f"🤖 Bot zagrywa Wirusa {card.name} na Organ {target.name} gracza {opponent.name}")
+                        result = self.playCard(card, gameState.deck, gameState.discardPile, target, opponent)
+                        if result == 0:
+                            if gameState.checkForWinner():
+                                return
+                            return
+
+        # 3. Próbujemy zagrać kartę Szczepionka
+        for card in self.hand:
+            if isinstance(card, Szczepionka):
+                own_organs = list(self.organsOnTable.keys())
+                if own_organs:
+                    allowed_targets = [
+                        organ for organ in own_organs
+                        if (card.color == 'joker' or organ.color == 'joker' or organ.color == card.color)
+                    ]
+                    if allowed_targets:
+                        target = random.choice(allowed_targets)
+                        print(f"🤖 Bot zagrywa Szczepionkę {card.name} na Organ {target.name}")
+                        result = self.playCard(card, gameState.deck, gameState.discardPile, target)
+                        if result == 0:
+                            if gameState.checkForWinner():
+                                return
+                            return
+
+        # 4. Jeśli brak ruchu – bot odrzuca trzy karty i dobiera nowe
+        num_cards_to_discard = min(3, len(self.hand))  # Maksymalnie 3 karty
+        cards_to_discard = random.sample(self.hand, num_cards_to_discard)
+
+        for card_to_discard in cards_to_discard:
+            print(f"🤖 Bot nie ma dobrego ruchu – odrzuca kartę {card_to_discard.name}")
+            self.hand.remove(card_to_discard)
+            gameState.discardPile.append(card_to_discard)
+
+        for _ in range(num_cards_to_discard):
+            self.drawCard(gameState.deck, gameState.discardPile)
+
+        # Ostateczne sprawdzenie, czy bot wygrał po odrzuceniu kart
+        if gameState.checkForWinner():
+            return
