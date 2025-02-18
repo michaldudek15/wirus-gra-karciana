@@ -3,6 +3,7 @@ body {
     margin-right: 10%;
     font-family: sans-serif;
     background-color: #c3e06d;
+    font-size: 2vmin;
 }
 
 h1 {
@@ -18,7 +19,7 @@ h1 {
     display: flex;
     justify-content: space-between; /* Elementy zostaną rozmieszczone skrajnie */
     align-items: center; /* Wyśrodkowanie w pionie */
-    padding: 10px; /* Opcjonalnie, dodanie odstępu wewnętrznego */
+    padding: 1vmin; /* Opcjonalnie, dodanie odstępu wewnętrznego */
 }
 
 .przycisk {
@@ -27,7 +28,7 @@ h1 {
     color: white;               /* Kolor tekstu */
     border: none;               /* Brak ramki */
     border-radius: 8px;         /* Zaokrąglone rogi */
-    padding: 10px 20px;         /* Odstępy wewnętrzne */
+    padding: 1vmin 2vmin;         /* Odstępy wewnętrzne */
     font-size: 16px;            /* Rozmiar czcionki */
     font-weight: bold;          /* Pogrubienie tekstu */
     text-transform: uppercase;  /* Wszystkie litery wielkie */
@@ -55,9 +56,9 @@ h1 {
     position: fixed; 
     top: 48%; 
     left: 0; 
-    margin: 10px;
+    margin: 1vmin;
     z-index: 1000;
-    padding: 10px;
+    padding: 1vmin;
 }
 
 #przycisk-akceptuj {
@@ -66,7 +67,7 @@ h1 {
     top: 48%; 
     right: 0; 
     z-index: 1000;
-    padding: 10px;
+    padding: 1vmin;
 }
 
 #przyciski-wymiana {
@@ -94,8 +95,8 @@ h1 {
     position: fixed;
     left: 0;
     right: 0;
-    padding: 10px;
-    height: 120px;
+    padding: 1vmin;
+    height: 14vmin;
 }
 
 #panel-kart-bot {
@@ -116,8 +117,8 @@ h1 {
     position: fixed;
     left: 0;
     right: 0;
-    padding: 10px;
-    height: 120px;
+    padding: 1vmin;
+    height: 14vmin;
 }
 
 #panel-ciala-bot {
@@ -132,10 +133,10 @@ h1 {
 }
 
 .karta-reka {
-    width: 100px;
-    height: 100px;
-    margin: 0 10px;
-    padding: 10px;
+    width: 12vmin;
+    height: 12vmin;
+    margin: 0 1vmin;
+    padding: 1vmin;
     border: 2px solid #000000;
     border-radius: 8px;
     background: #ddd;
@@ -163,10 +164,10 @@ h1 {
 }  
 
 .karta-cialo {
-    width: 100px;
-    height: 100px;
-    margin: 0 10px;
-    padding: 10px;
+    width: 12vmin;
+    height: 12vmin;
+    margin: 0 1vmin;
+    padding: 1vmin;
     border: 2px solid #000000;  
     border-radius: 8px;
     background: #ddd;
@@ -194,10 +195,10 @@ h1 {
 }  
 
 .karta-placeholder {
-    width: 100px;
-    height: 100px;
-    margin: 0 10px;
-    padding: 10px;
+    width: 12vmin;
+    height: 12vmin;
+    margin: 0 1vmin;
+    padding: 1vmin;
     border: 2px dashed #999;
     border-radius: 8px;
     background: #ddd;
@@ -221,7 +222,7 @@ h1 {
 }  
 
 .highlight {
-    border: 10px solid #DA2580;  /* złote obramowanie */
+    border: 1vmin solid #DA2580;  /* złote obramowanie */
 
 }
 

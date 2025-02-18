@@ -68,9 +68,10 @@ def graZBotem():
     player1 = Player("player1")
     bot = BotPlayer("bot")
 
-    # testowaKarta1 = Organ("serce", "red", "opis")
-    # testowaKarta2 = Organ("mózg", "blue", "opis")
-    # testowaKarta3 = Organ("kość", "yellow", "opis")
+    testowaKarta1 = Organ("serce", "red", "opis")
+    testowaKarta2 = Organ("mózg", "blue", "opis")
+    testowaKarta3 = Organ("organ", "joker", "opis")
+
 
     gra.addPlayer(player1)
     gra.addPlayer(bot)
@@ -83,9 +84,9 @@ def graZBotem():
     bot.drawCard(gra.deck, gra.discardPile)
     bot.drawCard(gra.deck, gra.discardPile)
 
-    # player1.organsOnTable[testowaKarta1] = testowaKarta1.status
-    # player1.organsOnTable[testowaKarta2] = testowaKarta2.status
-    # player2.organsOnTable[testowaKarta3] = testowaKarta3.status
+    bot.organsOnTable[testowaKarta1] = testowaKarta1.status
+    bot.organsOnTable[testowaKarta2] = testowaKarta2.status
+    bot.organsOnTable[testowaKarta3] = testowaKarta3.status
 
     session['gra'] = gra
     session['player1'] = player1
@@ -217,6 +218,15 @@ def wymienKarty():
 
     # Zapisujemy zaktualizowany stan gry do sesji
     session['gra'] = gra
+
+    zwyciezca = gra.checkForWinner()
+
+    if zwyciezca:
+        komunikat = f"{zwyciezca.name} wygrał grę!"
+        # Opcjonalnie: usuwamy stan gry z sesji, aby nie dopuścić do dalszych ruchów
+        session.pop('gra', None)
+        # Przekierowujemy na stronę końcową lub renderujemy szablon z komunikatem
+        return render_template('game-over.html', zwyciezca=zwyciezca, komunikat=komunikat)
 
     if session.get('gameMode') == 'hotseat':
         return render_template('graHotseat.html', 
