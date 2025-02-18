@@ -52,8 +52,8 @@ class Player:
     def __init__(self, name: str):
         self.playerId = str(uuid.uuid4())
         self.name = name
-        self.hand = []  # Lista kart w ręce
-        self.organsOnTable = {}  # Słownik: nazwa organu -> status
+        self.hand = []
+        self.organsOnTable = {}
 
     def printCardsOnHand(self):
         "Wyświelt karty z ręki."
@@ -69,8 +69,7 @@ class Player:
         """
         if not deck:
             if not discardPile:
-                raise ValueError("Talia jest pusta, brak kart do doboru!")
-            # Uzupełniamy talię ze stosu odrzuconych
+                print("ERROR: talia jest pusta, brak kart do doboru!")
             deck.extend(discardPile)
             discardPile.clear()
             random.shuffle(deck)
@@ -79,13 +78,6 @@ class Player:
         self.hand.append(card)
         return card
     
-    # def discardCardsFromHand(self, deck: list, discardPile: list, *cards):
-    #     "Odrzuć karty na stos kart odrzuconych."
-    #     for card in cards:
-    #         discardPile.append(card)
-    #         self.hand.remove(card)
-    #         self.drawCard(deck)
-
     def exchangeCards(self, deck: list, discardPile: list, card_ids: list):
         """
         Wymienia karty z ręki na podstawie podanej listy identyfikatorów.
@@ -109,66 +101,51 @@ class Player:
     def playCard(self, card: Card, deck: list, discardPile: list, target=None, targetPlayer=None):
         "Zagraj kartę z ręki."
         if card not in self.hand:
-            raise ValueError(f"Karta {card.name} nie znajduje się w ręce gracza!")
+            print("ERROR: karta {card.name} nie znajduje się w ręce gracza!")
 
         result = 0
 
         if isinstance(card, Organ):
-            # Iterujemy po istniejących kluczach w organsOnTable
             for existing_key in self.organsOnTable.keys():
-                # Jeśli klucz to obiekt posiadający atrybut 'name'
                 if hasattr(existing_key, "name"):
                     if existing_key.name == card.name:
                         print("1.Organ {card.name} już znajduje się na stole gracza {self.name}!")
                         result = -1
                 else:
-                    # Jeśli klucz jest stringiem, porównujemy bezpośrednio
                     if existing_key == card.name:
                         print("2.Organ {card.name} już znajduje się na stole gracza {self.name}!")
                         result = -1
-            # Jeśli nie znaleziono duplikatu, dodajemy obiekt jako klucz
             if (result == 0):
                 self.hand.remove(card)
                 self.organsOnTable[card] = "sterylny"
                 print(f"{self.name} zagrał organ {card.name}.")
                 self.drawCard(deck, discardPile)
         
-
         elif isinstance(card, Szczepionka):
-            print("ZAGRANIE SZCZEPIONKI\n")
-            
-            # Sprawdzenie, czy został przekazany cel
             if target is None:
                 print("Nie wybrano celu dla szczepionki!")
                 return -1
 
-            # Upewniamy się, że cel jest organem
             if not isinstance(target, Organ):
                 print("Cel nie jest organem!")
                 return -1
 
-            # Ustalamy właściciela stołu – jeśli targetPlayer nie został przekazany, przyjmujemy, że to gracz wykonujący ruch
             tableOwner = self if targetPlayer is None else targetPlayer
 
-            # Sprawdzamy, czy wybrany organ znajduje się na stole docelowego gracza
             if target not in tableOwner.organsOnTable:
-                print(f"Organ {target.name} nie znajduje się na stole gracza {tableOwner.name}!")
+                print("ERROR: organ {target.name} nie znajduje się na stole gracza {tableOwner.name}!")
                 return -1
 
-            # Sprawdzanie koloru:
-            # Jeśli szczepionka nie jest jokerem i organ nie jest jokerem, to ich kolory muszą się zgadzać.
             if card.color != 'joker' and target.color != 'joker' and card.color != target.color:
                 print(f"Szczepionkę koloru {card.color} można zagrać tylko na organ o kolorze {card.color}!")
                 return -1
 
             current_status = tableOwner.organsOnTable[target]
 
-            # Nie można zagrać szczepionki na uodporniony organ
             if current_status == "uodporniony":
                 print("Szczepionki nie można zagrać na uodporniony organ!")
                 return -1
 
-            # Zmieniamy status organu zgodnie z zasadami:
             if current_status == "sterylny":
                 new_status = "zaszczepiony"
             elif current_status == "zaszczepiony":
@@ -179,11 +156,9 @@ class Player:
                 print("Nieznany status organu!")
                 return -1
 
-            # Aktualizujemy status organu
             tableOwner.organsOnTable[target] = new_status
             target.status = new_status
 
-            # Usuwamy kartę szczepionki z ręki, dodajemy ją do stosu odrzuconych i dobieramy nową kartę
             self.hand.remove(card)
             discardPile.append(card)
             self.drawCard(deck, discardPile)
@@ -191,42 +166,32 @@ class Player:
             print(f"{self.name} zagrał szczepionkę na organ {target.name} gracza {tableOwner.name}. Organ zmienił status z {current_status} na {new_status}.")
             return 0
 
-
         elif isinstance(card, Wirus):
-            print("ZAGRANIE WIRUSA\n")
                     
-            # Sprawdzenie, czy został przekazany cel
             if target is None:
                 print("Nie wybrano celu dla wirusa!")
                 return -1
 
-            # Upewniamy się, że cel jest organem
             if not isinstance(target, Organ):
                 print("Cel nie jest organem!")
                 return -1
 
-            # Ustalamy właściciela stołu – jeśli targetPlayer nie został przekazany, przyjmujemy, że to gracz wykonujący ruch
             tableOwner = self if targetPlayer is None else targetPlayer
 
-            # Sprawdzamy, czy wybrany organ znajduje się na stole docelowego gracza
             if target not in tableOwner.organsOnTable:
                 print(f"Organ {target.name} nie znajduje się na stole gracza {tableOwner.name}!")
                 return -1
 
-            # Sprawdzanie koloru:
-            # Jeśli wirus nie jest jokerem i organ nie jest jokerem, to ich kolory muszą się zgadzać.
             if card.color != 'joker' and target.color != 'joker' and card.color != target.color:
                 print(f"Wirusa koloru {card.color} można zagrać tylko na organ o kolorze {card.color}!")
                 return -1
 
             current_status = tableOwner.organsOnTable[target]
 
-            # Nie można zagrać wirusa na uodporniony organ
             if current_status == "uodporniony":
                 print("Wirusa nie można zagrać na uodporniony organ!")
                 return -1
 
-            # Efekty zagrania wirusa:
             if current_status == "zaszczepiony":
                 new_status = "sterylny"
                 tableOwner.organsOnTable[target] = new_status
@@ -245,7 +210,6 @@ class Player:
                 print("Nieznany status organu!")
                 return -1
 
-            # Usuwamy kartę wirusa z ręki, dodajemy ją do stosu odrzuconych i dobieramy nową kartę
             self.hand.remove(card)
             discardPile.append(card)
             self.drawCard(deck, discardPile)
@@ -273,7 +237,6 @@ class GameState:
         self.discardPile = []
 
     def activePlayer(self):
-        # Zamieniamy słownik na listę; założenie: kolejność graczy odpowiada kolejności dodawania
         players_list = list(self.players.values())
         if not players_list:
             return None
@@ -283,7 +246,7 @@ class GameState:
         winner = self.checkForWinner()
         if winner:
             print(f"🎉 Gra zakończona! Zwycięzca: {winner.name} 🎉")
-            return  # Kończy grę, gdy jest zwycięzca
+            return
         
         self.currentPlayerIndex = (self.currentPlayerIndex + 1) % len(self.players)
         
@@ -292,7 +255,6 @@ class GameState:
 
         if isinstance(current_player, BotPlayer):
             current_player.makeMove(self)
-            # Automatycznie przechodzimy do kolejnej tury po ruchu bota
             self.nextTurn()
 
     def addPlayer(self, player: Player):
@@ -305,8 +267,8 @@ class GameState:
                 if status in {"sterylny", "zaszczepiony", "uodporniony"}
             ]
             if len(valid_organs) >= 4:
-                print(f"🎉 Gracz {player.name} wygrał, ponieważ ma {len(valid_organs)} organów spełniających warunki zwycięstwa! 🎉")
-                self.winner = player  # Nowy atrybut przechowujący zwycięzcę
+                print(f"🎉 Gracz {player.name} wygrał! 🎉")
+                self.winner = player
                 return player
         return None      
 
@@ -317,15 +279,11 @@ class GameState:
         """
         if not self.deck:
             if not self.discardPile:
-                raise ValueError("Brak kart do przetasowania: zarówno talia, jak i stos odrzuconych są puste!")
-            # Dodaj karty ze stosu odrzuconych do talii
+                print("ERROR: brak kart do przetasowania: zarówno talia, jak i stos odrzuconych są puste!")
             self.deck.extend(self.discardPile)
-            # Wyczyść stos odrzuconych
             self.discardPile.clear()
-            # Przetasuj talię
             random.shuffle(self.deck)
             print("Talia została uzupełniona ze stosu odrzuconych i przetasowana.")
-
 
     def __repr__(self):
         return (
@@ -348,11 +306,10 @@ class BotPlayer(Player):
             self.drawCard(gameState.deck, gameState.discardPile)
             return
         
-        # Sprawdzenie czy bot wygrał przed ruchem
         if gameState.checkForWinner():
             return
 
-        # 1. Próbujemy zagrać kartę Organ
+        # 1. próba zagrania Organu
         for card in self.hand:
             if isinstance(card, Organ):
                 if all(existing_card.name != card.name for existing_card in self.organsOnTable.keys()):
@@ -360,10 +317,10 @@ class BotPlayer(Player):
                     result = self.playCard(card, gameState.deck, gameState.discardPile)
                     if result == 0:
                         if gameState.checkForWinner():
-                            return  # Jeśli bot wygrał, kończymy natychmiast
+                            return
                         return
 
-        # 2. Próbujemy zagrać kartę Wirus
+        # 2. próba zagrania wirusa
         opponent = next(p for p in gameState.players.values() if p != self)
         if opponent.organsOnTable:
             for card in self.hand:
@@ -381,7 +338,7 @@ class BotPlayer(Player):
                                 return
                             return
 
-        # 3. Próbujemy zagrać kartę Szczepionka
+        # 3. próba zagrania szczepionki
         for card in self.hand:
             if isinstance(card, Szczepionka):
                 own_organs = list(self.organsOnTable.keys())
@@ -399,8 +356,8 @@ class BotPlayer(Player):
                                 return
                             return
 
-        # 4. Jeśli brak ruchu – bot odrzuca trzy karty i dobiera nowe
-        num_cards_to_discard = min(3, len(self.hand))  # Maksymalnie 3 karty
+        # 4. wymiana kart
+        num_cards_to_discard = min(3, len(self.hand))
         cards_to_discard = random.sample(self.hand, num_cards_to_discard)
 
         for card_to_discard in cards_to_discard:
@@ -411,6 +368,5 @@ class BotPlayer(Player):
         for _ in range(num_cards_to_discard):
             self.drawCard(gameState.deck, gameState.discardPile)
 
-        # Ostateczne sprawdzenie, czy bot wygrał po odrzuceniu kart
         if gameState.checkForWinner():
             return
