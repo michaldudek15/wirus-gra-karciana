@@ -365,7 +365,7 @@ class BotPlayer(Player):
             self.hand.remove(card_to_discard)
             gameState.discardPile.append(card_to_discard)
 
-        for _ in range(num_cards_to_discard):
+        for i in range(num_cards_to_discard):
             self.drawCard(gameState.deck, gameState.discardPile)
 
         if gameState.checkForWinner():

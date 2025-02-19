@@ -86,7 +86,6 @@
     </div>
     {% endfor %}
 
-    {# Puste miejsca – unikalny id generowany z indeksem #}
     {% for i in range(sloty - liczbaKartWCiele) %}
     <div class="karta-placeholder" id="placeholder"
          onclick="wyborTargetu(this)">
@@ -109,12 +108,10 @@
 
 <script>
     function wybor(elem) {
-        // Pobierz kontener, w którym znajduje się karta (np. panel-kart-gracz lub panel-kart-bot)
         var container = elem.closest('.panel-kart');
         var playerId = container ? container.getAttribute('data-playerid') : "";
         console.log("Wybrano kartę źródłową o id: " + elem.id + " gracza o id: " + playerId);
 
-        // Jeśli kliknięta karta jest już zaznaczona, usuń podświetlenie i wyczyść ukryte pola formularza
         if (elem.classList.contains('highlight')) {
             elem.classList.remove('highlight');
             var sourceCardInput = document.getElementById('source_card_id');
@@ -128,18 +125,13 @@
             return;
         }
 
-        // Usuń podświetlenie ze wszystkich kart we wszystkich panelach rąk
         var cards = document.querySelectorAll('.panel-kart .karta-reka');
         cards.forEach(function(card) {
             card.classList.remove('highlight');
         });
 
-        // Podświetl klikniętą kartę
         elem.classList.add('highlight');
 
-        // Uzupełnij wartości w formularzu:
-        // - id źródłowej karty
-        // - id źródłowego gracza
         var sourceCardInput = document.getElementById('source_card_id');
         if (sourceCardInput) {
             sourceCardInput.value = elem.id;
@@ -151,14 +143,11 @@
     }
 
     function wyborTargetu(elem) {
-        // Pobierz najbliższy kontener panelu ciała, żeby odczytać atrybut data-playerid
         var container = elem.closest('.panel-ciala');
         var playerId = container ? container.getAttribute('data-playerid') : "";
 
         console.log("Wybrano kartę o id: " + elem.id + " gracza o id: " + playerId);
 
-
-        // Jeśli kliknięty element jest już podświetlony, to usuń podświetlenie oraz wyczyść ukryte pola
         if (elem.classList.contains('highlight')) {
             elem.classList.remove('highlight');
 
@@ -173,18 +162,13 @@
             return;
         }
 
-        // Usuń podświetlenie ze wszystkich elementów docelowych (we wszystkich panelach ciała)
         var targets = document.querySelectorAll('.panel-ciala .karta-cialo, .panel-ciala .karta-placeholder');
         targets.forEach(function(target) {
             target.classList.remove('highlight');
         });
 
-        // Podświetl kliknięty element
         elem.classList.add('highlight');
 
-        // Ustaw wartość ukrytego pola target_card_id:
-        // Jeśli kliknięty element to placeholder, nie ustawiamy id karty (pozostawiamy placeholder)
-        // Jeśli to karta – ustawiamy jej id
         var targetCardInput = document.getElementById('target_card_id');
         if (targetCardInput) {
             if (elem.classList.contains('karta-placeholder')) {
@@ -194,7 +178,6 @@
             }
         }
 
-        // Ustaw wartość ukrytego pola target_player_id na id gracza pobrane z kontenera
         var targetPlayerInput = document.getElementById('target_player_id');
         if (targetPlayerInput) {
             targetPlayerInput.value = playerId;
@@ -202,13 +185,11 @@
     }
 
     function anulujWybor() {
-        // Usuń podświetlenia ze wszystkich elementów
         var highlightedElements = document.querySelectorAll('.highlight');
         highlightedElements.forEach(function(element) {
             element.classList.remove('highlight');
         });
     
-        // Wyczyść wartości w formularzu ruchu (źródłowe i docelowe pola)
         var sourcePlayerInput = document.getElementById('source_player_id_move');
         var sourceCardInput = document.getElementById('source_card_id');
         var targetPlayerInput = document.getElementById('target_player_id');
@@ -219,11 +200,9 @@
         if (targetPlayerInput) { targetPlayerInput.value = ""; }
         if (targetCardInput) { targetCardInput.value = ""; }
         
-        // Wyczyść także wartość ukrytego pola formularza wymiany kart
         var exchangeCardsField = document.getElementById('exchangeCardsField');
         if (exchangeCardsField) { exchangeCardsField.value = ""; }
         
-        // Wyłącz tryb wymiany (usunięcie klas exchange-mode i exchange-selected oraz przywrócenie standardowych onclick)
         disableExchangeMode();
         
         console.log("Anulowano wybór, formularz wymiany został wyczyszczony, a tryb wymiany wyłączony.");
@@ -235,17 +214,13 @@
     }
 
     document.getElementById('zagrajKarteForm').addEventListener('submit', function(event) {
-        // Zatrzymujemy wysyłkę formularza, aby pokazać alert
         event.preventDefault();
         
-        // Pobierz wartości z ukrytych pól
         var sourcePlayer = document.getElementById('source_player_id_exchange').value.trim();
         var source = document.getElementById('source_card_id').value.trim();
         var targetPlayer = document.getElementById('target_player_id').value.trim();
         var target = document.getElementById('target_card_id').value.trim();
 
-
-        // Sprawdź, czy oba pola są wypełnione
         if (source === "" || target === "") {
             alert("Błąd: Nie wybrano karty źródłowej lub targetu!");
         } else {
@@ -259,16 +234,13 @@
     let selectedExchangeCards = [];
 
     document.addEventListener("DOMContentLoaded", function() {
-        // Załóżmy, że player1.playerId jest dostępne i podajesz go w szablonie jako zmienną JS
         const sourcePlayerId = "{{ activePlayer.playerId }}";
         
-        // Ustaw wartość dla ukrytego pola w formularzu ruchu
         const sourcePlayerInputMove = document.getElementById("source_player_id_move");
         if (sourcePlayerInputMove) {
             sourcePlayerInputMove.value = sourcePlayerId;
         }
     
-        // Ustaw wartość dla ukrytego pola w formularzu wymiany
         const sourcePlayerInputExchange = document.getElementById("source_player_id_exchange");
         if (sourcePlayerInputExchange) {
             sourcePlayerInputExchange.value = sourcePlayerId;
@@ -279,7 +251,6 @@
         exchangeMode = true;
         selectedExchangeCards = [];
     
-        // Znajdujemy aktywnego gracza w trybie hotseat
         var activePanel = document.querySelector(".panel-kart:not(.ukryta)");
         if (!activePanel) {
             console.error("Nie znaleziono aktywnego panelu kart!");
@@ -288,7 +259,6 @@
     
         console.log("Tryb wymiany aktywowany. Wybierz do 3 kart do wymiany.");
     
-        // Pobierz wszystkie karty w ręce aktywnego gracza
         const cards = activePanel.querySelectorAll(".karta-reka");
         if (cards.length === 0) {
             alert("Nie masz kart do wymiany!");
@@ -296,8 +266,8 @@
         }
     
         cards.forEach(card => {
-            card.classList.add("exchange-mode");  // Dodajemy efekt trybu wymiany
-            card.removeAttribute("onclick");  // Usuwamy stare onclick, żeby uniknąć konfliktów
+            card.classList.add("exchange-mode");
+            card.removeAttribute("onclick");
             card.addEventListener("click", function() {
                 cardClicked(card);
             });
@@ -316,7 +286,6 @@
         cards.forEach(card => {
             card.classList.remove("exchange-mode");
             card.classList.remove("highlight");
-            // Przywracamy domyślne działanie – np. funkcję wybor()
             card.removeEventListener("click", cardClicked);
             card.setAttribute("onclick", "wybor(this)");
         });
@@ -324,14 +293,12 @@
     }
 
 function cardClicked(cardElement) {
-    if (!exchangeMode) return; // jeśli tryb wymiany nie jest aktywny, ignoruj kliknięcie
+    if (!exchangeMode) return;
 
-    // Jeśli karta jest już podświetlona (czyli zaznaczona), odznacz ją
     if (cardElement.classList.contains("highlight")) {
         cardElement.classList.remove("highlight");
         selectedExchangeCards = selectedExchangeCards.filter(id => id !== cardElement.id);
     } else {
-        // Jeśli nie jest zaznaczona, dodaj ją – ale tylko, gdy nie przekroczysz limitu 3 kart
         if (selectedExchangeCards.length < 3) {
             cardElement.classList.add("highlight");
             selectedExchangeCards.push(cardElement.id);
@@ -353,21 +320,17 @@ document.getElementById("przycisk-akceptuj-wymiana").addEventListener("click", f
         return;
     }
     
-    // Przypisz karty do poszczególnych pól
     document.getElementById("first_card_id").value = selectedExchangeCards[0] || "";
     document.getElementById("second_card_id").value = selectedExchangeCards[1] || "";
     document.getElementById("third_card_id").value = selectedExchangeCards[2] || "";
     
-    // Wysyłamy formularz wymiany
     document.getElementById("exchangeForm").submit();
     disableExchangeMode();
 });
 
 document.getElementById('exchangeForm').addEventListener('submit', function(event) {
-    // Zatrzymujemy wysyłkę formularza, aby pokazać alert
     event.preventDefault();
     
-    // Pobierz wartości z ukrytych pól
     var sourcePlayer = document.getElementById('source_player_id_exchange').value.trim();
     var pierwsza = document.getElementById('first_card_id').value.trim();
     var druga = document.getElementById('second_card_id').value.trim();
@@ -378,18 +341,6 @@ document.getElementById('exchangeForm').addEventListener('submit', function(even
     
 });
 
-
-
 </script>
 
-
-
-
-<!-- <script>
-    
-    sprawdzenie wartości w formularzu
-
-
-    
-</script> -->
 {% endblock %}
