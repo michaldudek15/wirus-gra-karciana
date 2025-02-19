@@ -9,50 +9,50 @@ body {
 h1 {
     color: #DA2580;
     text-shadow: 
-    -1px -1px 0 #ffffff,  /* Góra-lewo */
-    1px -1px 0 #ffffff,   /* Góra-prawo */
-    -1px 1px 0 #ffffff,   /* Dół-lewo */
-    1px 1px 0 #ffffff;    /* Dół-prawo */
+    -1px -1px 0 #ffffff,  /* góra-lewo */
+    1px -1px 0 #ffffff,   /* góra-prawo */
+    -1px 1px 0 #ffffff,   /* dół-lewo */
+    1px 1px 0 #ffffff;    /* dół-prawo */
 }
 
 .gorny-pasek {
     display: flex;
-    justify-content: space-between; /* Elementy zostaną rozmieszczone skrajnie */
-    align-items: center; /* Wyśrodkowanie w pionie */
-    padding: 1vmin; /* Opcjonalnie, dodanie odstępu wewnętrznego */
+    justify-content: space-between;
+    align-items: center;
+    padding: 1vmin;
 }
 
 .przycisk {
     display: inline-block;
-    background-color: #DA2580; /* Główny kolor przycisku */
-    color: white;               /* Kolor tekstu */
-    border: none;               /* Brak ramki */
-    border-radius: 8px;         /* Zaokrąglone rogi */
-    padding: 1vmin 2vmin;         /* Odstępy wewnętrzne */
-    font-size: 16px;            /* Rozmiar czcionki */
-    font-weight: bold;          /* Pogrubienie tekstu */
-    text-transform: uppercase;  /* Wszystkie litery wielkie */
-    cursor: pointer;            /* Kursor wskazujący, że element jest klikalny */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Cień przycisku */
-    transition: all 0.3s ease;  /* Płynne przejścia */
+    background-color: #DA2580;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 1vmin 2vmin;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
     text-shadow: 
-        -1px -1px 0 #000,     /* Góra-lewo */
-        1px -1px 0 #000,      /* Góra-prawo */
-        -1px 1px 0 #000,      /* Dół-lewo */
-        1px 1px 0 #000;       /* Dół-prawo */
+        -1px -1px 0 #000,     /* góra-lewo */
+        1px -1px 0 #000,      /* góra-prawo */
+        -1px 1px 0 #000,      /* dół-lewo */
+        1px 1px 0 #000;       /* dół-prawo */
 }
 
 .przycisk:hover {
-    transform: scale(1.05);                     /* Delikatne powiększenie */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);    /* Większy cień */
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 .przycisk:active {
-    transform: scale(0.95);                     /* Delikatne zmniejszenie */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);     /* Mniejszy cień */
+    transform: scale(0.95);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }   
 
 #przycisk-anuluj {
-    background-color: #ff0000; /* Główny kolor przycisku */
+    background-color: #ff0000;
     position: fixed; 
     top: 48%; 
     left: 0; 
@@ -62,7 +62,7 @@ h1 {
 }
 
 #przycisk-akceptuj {
-    background-color: #22ff00; /* Główny kolor przycisku */
+    background-color: #22ff00;
     position: fixed; 
     top: 48%; 
     right: 0; 
@@ -77,18 +77,15 @@ h1 {
 }
 
 #przycisk-wymiana {
-    background-color: #fffb00; /* Główny kolor przycisku */
-
+    background-color: #fffb00;
 }
 
 #przycisk-akceptuj-wymiana {
-    background-color: #fffb00; /* Główny kolor przycisku */
-
+    background-color: #fffb00;
 }
 
-/* Kontener na karty w ręce graczy*/
 .panel-kart {
-    visibility: visible; /* tutaj zmienić potem*/
+    visibility: visible;
     display: flex;
     justify-content: center;
     align-items: flex-end;
@@ -109,7 +106,6 @@ h1 {
     background-color: rgba(181, 81, 182, 0.8);
 }
 
-/* Kontener na ciała graczy*/
 .panel-ciala {
     display: flex;
     justify-content: center;
@@ -124,7 +120,6 @@ h1 {
 #panel-ciala-bot {
     top: 30%;
     background-color: rgba(44, 11, 11, 0.8);
-
 }
 
 #panel-ciala-gracz {
@@ -148,19 +143,19 @@ h1 {
     align-items: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     text-shadow: 
-        -1px -1px 0 #000,     /* Góra-lewo */
-        1px -1px 0 #000,      /* Góra-prawo */
-        -1px 1px 0 #000,      /* Dół-lewo */
-        1px 1px 0 #000;       /* Dół-prawo */
+        -1px -1px 0 #000,     /* góra-lewo */
+        1px -1px 0 #000,      /* góra-prawo */
+        -1px 1px 0 #000,      /* dół-lewo */
+        1px 1px 0 #000;       /* dół-prawo */
 }
 
 .karta-reka:hover {
-    transform: scale(1.05);                     /* Delikatne powiększenie */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);    /* Większy cień */
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 .karta-reka:active {
-    transform: scale(0.95);                     /* Delikatne zmniejszenie */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);     /* Mniejszy cień */
+    transform: scale(0.95);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }  
 
 .karta-cialo {
@@ -179,19 +174,19 @@ h1 {
     align-items: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
     text-shadow: 
-        -1px -1px 0 #000,     /* Góra-lewo */
-        1px -1px 0 #000,      /* Góra-prawo */
-        -1px 1px 0 #000,      /* Dół-lewo */
-        1px 1px 0 #000;       /* Dół-prawo */  
+        -1px -1px 0 #000,     /* góra-lewo */
+        1px -1px 0 #000,      /* góra-prawo */
+        -1px 1px 0 #000,      /* dół-lewo */
+        1px 1px 0 #000;       /* dół-prawo */  
 }
 
 .karta-cialo:hover {
-    transform: scale(1.05);                     /* Delikatne powiększenie */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);    /* Większy cień */
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 .karta-cialo:active {
-    transform: scale(0.95);                     /* Delikatne zmniejszenie */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);     /* Mniejszy cień */
+    transform: scale(0.95);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }  
 
 .karta-placeholder {
@@ -213,30 +208,27 @@ h1 {
 }
 
 .karta-placeholder:hover {
-    transform: scale(1.05);                     /* Delikatne powiększenie */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);    /* Większy cień */
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 .karta-placeholder:active {
-    transform: scale(0.95);                     /* Delikatne zmniejszenie */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);     /* Mniejszy cień */
+    transform: scale(0.95);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }  
 
 .highlight {
-    border: 1vmin solid #DA2580;  /* złote obramowanie */
-
+    border: 1vmin solid #DA2580;
 }
 
 .ukryta {
     display: none;
   }
 
-/* Styl podświetlenia kart w trybie wymiany */
 .karta-reka.exchange-mode {
     outline: 2px solid orange;
     cursor: pointer;
 }
 
-/* Styl dla zaznaczonych kart */
 .karta-reka.exchange-selected {
     border: 3px solid red;
 }
