@@ -1,5 +1,4 @@
 from flask import Flask, render_template, url_for, request, redirect, flash, session, get_flashed_messages
-from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
 from flask_socketio import SocketIO
 from deck import buildDeck
